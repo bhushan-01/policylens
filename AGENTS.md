@@ -37,7 +37,7 @@ Also: a code scanner (`policylens/scanner.py`) and an MCP server exposing both t
 | Agent / MCP | agent.py, mcp_server.py (tools: search_law, get_article, classify_product, scan_codebase, evidence_gaps, verify_citations) |
 | Evals | evals/evidence.py (83 offline checks), evals/retrieval.py, evals/assertions.py; fixtures in evals/fixtures/ |
 | Demo inputs | examples/sample_company, sample_questionnaire.md, sample_repo, sample_output |
-| Business | docs/CUSTOMER_DISCOVERY.md, docs/OUTREACH.md |
+| Business | docs/BUSINESS_PLAN.md, docs/CUSTOMER_DISCOVERY.md, docs/OUTREACH.md |
 
 Conventions: import as `from policylens import laws`; never use relative paths to data (use `policylens.paths`);
 run modules with `python -m policylens.<name>`; install once with `pip install -e . --no-deps`.

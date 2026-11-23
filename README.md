@@ -88,6 +88,7 @@ docs/                        guides; docs/learning/ holds the study material
 | [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Setup, running every tool, reading outputs, troubleshooting |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Data layer, modules, data flow, trust model, MCP tools, extending |
 | [docs/SAFETY_AND_LIMITS.md](docs/SAFETY_AND_LIMITS.md) | What is guaranteed, what is not, the evals, privacy |
+| [docs/BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Market findings, directions A/B/C, what is built, risks, next steps |
 | [docs/CUSTOMER_DISCOVERY.md](docs/CUSTOMER_DISCOVERY.md) | Interview script and stop rule for validating the business |
 | [docs/OUTREACH.md](docs/OUTREACH.md) | Finding and contacting the first 15 interviewees |
 | [docs/learning/](docs/learning/) | `LEARNING.md`, `KNOWLEDGE_BASE.md`, `WHAT_IS_THIS.md` |
