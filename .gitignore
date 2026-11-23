@@ -12,10 +12,10 @@ __pycache__/
 dist/
 build/
 
-# Embeddings / model caches (can be regenerated)
-*.npy
+# Model caches (can be regenerated). Keep data/embeddings.npy in repo for ready-to-run search.
 .cache/
 models/
+__pycache__/
 
 # Environment / secrets
 .env

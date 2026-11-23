@@ -1,0 +1,62 @@
+[
+  {
+    "id": "q1",
+    "question": "Is CV screening or recruitment software high-risk?",
+    "expect_any": ["art_6", "annex_III"]
+  },
+  {
+    "id": "q2",
+    "question": "Can I use AI to detect my employees' emotions at work?",
+    "expect_any": ["art_5"]
+  },
+  {
+    "id": "q3",
+    "question": "What AI practices are prohibited under the EU AI Act?",
+    "expect_any": ["art_5"]
+  },
+  {
+    "id": "q4",
+    "question": "When is an AI system classified as high-risk?",
+    "expect_any": ["art_6"]
+  },
+  {
+    "id": "q5",
+    "question": "What are the transparency obligations for chatbots?",
+    "expect_any": ["art_50"]
+  },
+  {
+    "id": "q6",
+    "question": "What is the definition of an AI system?",
+    "expect_any": ["art_3"]
+  },
+  {
+    "id": "q7",
+    "question": "Remote biometric identification in public spaces",
+    "expect_any": ["art_5", "annex_III"]
+  },
+  {
+    "id": "q8",
+    "question": "Obligations of providers of high-risk AI systems",
+    "expect_any": ["art_16"]
+  },
+  {
+    "id": "q9",
+    "question": "General-purpose AI model obligations",
+    "expect_any": ["art_51", "art_53", "art_55"]
+  },
+  {
+    "id": "q10",
+    "question": "What annex lists high-risk AI use cases like hiring and credit scoring?",
+    "expect_any": ["annex_III"]
+  },
+  {
+    "id": "q11",
+    "question": "Can social scoring by public authorities be banned?",
+    "expect_any": ["art_5"]
+  },
+  {
+    "id": "q12",
+    "question": "Human oversight requirements for high-risk AI",
+    "expect_any": ["art_14"]
+  }
+]
