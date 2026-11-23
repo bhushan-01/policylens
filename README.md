@@ -36,27 +36,40 @@ On macOS, if `python` is missing, use `.venv/bin/python` or activate the venv fi
 
 ---
 
+## What this project is (read this)
+
+See **[WHAT_IS_THIS.md](WHAT_IS_THIS.md)**.
+
+**Main command (recommended):**
+
+```bash
+python src/policylens.py "We build CV screening software for HR teams"
+```
+
+That runs a sensible checklist: prohibited → high-risk → transparency → cited answer.
+
 ## Commands
 
 ```bash
-# Search
+# Main product flow (use this)
+python src/policylens.py "We build CV screening software for HR teams"
+
+# Web UI (same idea, browser)
+python src/app.py
+
+# Search only
 python src/search.py "Can I detect employees' emotions with AI?"
 
-# Retrieval eval (expect 12/12)
+# Evals
 python src/eval_retrieval.py
-
-# Assertion eval (fast / with LLM)
 python src/eval_assertions.py
 python src/eval_assertions.py --llm
 
-# Full answer
+# Older one-shot answer
 python src/classify.py "We build CV screening software for HR teams"
 
-# Agent (tool loop via OpenRouter if key set)
+# Tool-calling agent demo (learning / edge cases; not the main UX)
 python src/agent.py "Facial recognition in a shopping mall"
-
-# Web UI
-python src/app.py
 
 # MCP server (stdio) — used by Cursor / Claude Desktop
 python src/mcp_server.py
@@ -143,3 +156,47 @@ Injected Omnibus dates (not in 2024 PDF):
 | Web UI | ✅ |
 | Assertion evals | ✅ |
 | Deeper LLM-as-judge / production hardening | Future |
+
+## Evidence Pack (vendor product)
+
+Risk classification is free elsewhere. The paid pain is the **buyer questionnaire**:
+an AI vendor must answer a customer's EU AI Act due-diligence questions with evidence.
+The Evidence Pack does that for AI hiring / HR-tech vendors (Annex III point 4).
+
+```bash
+python src/evidence_pack.py --docs data/sample_company --questionnaire data/sample_questionnaire.md
+python src/evidence_pack.py ... --no-llm     # deterministic offline mode
+python src/eval_evidence.py                  # 39 safety evals, no API key needed
+python src/code_scan.py data/sample_repo     # scan a codebase for AI Act red flags
+python src/app.py                            # web UI, "Evidence Pack" tab
+```
+
+Outputs (in `out/`): `evidence_pack.md|html|json`, `gaps.csv` (what to fix first), and
+`ai_act_position.md` (public-page draft built only from evidenced facts).
+A committed sample lives in `examples/` (fictional company).
+
+What it does:
+1. **Classifies** the product from verbatim Annex III / Article 5 / Article 6 text.
+2. **Gap analysis** against 14 buyer-expected obligations (Art. 4, 9-15, 17, 43, 49, 72, 73, 86):
+   Evidenced / Partial / Missing, with the vendor document each one was found in.
+3. **Drafts questionnaire answers**: law facts only from retrieved Articles, company facts only
+   from the vendor's own docs, everything else becomes `[NEEDS INPUT: ...]`.
+4. **Verifies every answer**: cited Articles must exist and have been shown to the model; document
+   references must be real; negative claims and forward commitments are flagged for review.
+   If an obligation has no supporting document, the answer is forced to NEEDS INPUT.
+
+Limits to know: gap status is keyword triage, not a compliance finding; classification is a
+first pass on the intended-purpose text; dates rely on the Omnibus note in `src/answer.py`
+and must be re-checked against the Official Journal. Not legal advice.
+
+Business validation plan: [docs/CUSTOMER_DISCOVERY.md](docs/CUSTOMER_DISCOVERY.md).
+
+## Code scanner and editor tools
+
+`src/code_scan.py` scans a repository for patterns that deserve a human look: emotion/biometric
+libraries (Art. 5), automated reject/approve with no human step (Art. 14), missing logging (Art. 12),
+no AI disclosure (Art. 50), protected attributes as features (Art. 10), no incident procedure (Art. 73).
+Each finding has file:line, a verified Article, why, and a fix. The MCP server exposes it as
+`scan_codebase`, plus `evidence_gaps` and `verify_citations`, so Cursor or Claude Code can call them.
+
+Outreach and interview material: [docs/OUTREACH.md](docs/OUTREACH.md). Cursor instructions: [AGENTS.md](AGENTS.md).

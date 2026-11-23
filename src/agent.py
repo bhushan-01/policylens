@@ -104,7 +104,7 @@ def run_tool(name: str, args: dict):
     return {"error": f"unknown tool: {name}"}
 
 
-def agent_openrouter(product: str, env: dict) -> str:
+def agent_openrouter(product: str, env: dict, verbose: bool = True) -> str:
     from openai import OpenAI
 
     client = OpenAI(
@@ -116,8 +116,14 @@ def agent_openrouter(product: str, env: dict) -> str:
         {
             "role": "system",
             "content": (
-                "You are PolicyLens. Use tools to classify the product under the EU AI Act. "
-                "Cite Articles/Annexes. If unsure, say so. Not formal legal advice."
+                "You are PolicyLens, a tool-using agent for the EU AI Act.\n"
+                "You MUST call tools before giving a final answer.\n"
+                "Typical plan:\n"
+                "1) search_law for prohibited practices related to the product\n"
+                "2) search_law for high-risk / Annex III issues\n"
+                "3) get_article on the most relevant parent_id (e.g. art_5, art_6, annex_III)\n"
+                "4) Then write the final classification with citations.\n"
+                "If evidence is weak, say you are not sure. Not formal legal advice."
             ),
         },
         {
@@ -126,7 +132,16 @@ def agent_openrouter(product: str, env: dict) -> str:
         },
     ]
 
-    for _ in range(6):
+    if verbose:
+        print("=" * 60)
+        print("AGENT LOOP (this is the agent part)")
+        print("Product:", product)
+        print("=" * 60)
+
+    for step in range(1, 7):
+        if verbose:
+            print(f"\n--- Step {step}: model thinks / may call tools ---")
+
         resp = client.chat.completions.create(
             model=model,
             messages=messages,
@@ -141,12 +156,33 @@ def agent_openrouter(product: str, env: dict) -> str:
                 "tool_calls": msg.tool_calls,
             }
         )
+
         if not msg.tool_calls:
+            if verbose:
+                print("No more tool calls → final answer.\n")
+                print("=" * 60)
+                print("FINAL ANSWER")
+                print("=" * 60)
             return msg.content or ""
 
         for call in msg.tool_calls:
             args = json.loads(call.function.arguments or "{}")
+            if verbose:
+                print(f"TOOL CALL → {call.function.name}({json.dumps(args)})")
             out = run_tool(call.function.name, args)
+            if verbose:
+                if call.function.name == "search_law" and isinstance(out, list):
+                    top = ", ".join(
+                        f"{x.get('parent_id')}({x.get('score')})" for x in out[:3]
+                    )
+                    print(f"TOOL RESULT ← top hits: {top}")
+                elif call.function.name == "get_article" and isinstance(out, dict):
+                    print(
+                        f"TOOL RESULT ← {out.get('citation')} "
+                        f"({out.get('pieces')} pieces, title={out.get('title')})"
+                    )
+                else:
+                    print("TOOL RESULT ← (received)")
             messages.append(
                 {
                     "role": "tool",
@@ -158,20 +194,23 @@ def agent_openrouter(product: str, env: dict) -> str:
 
 
 def main():
-    product = (
-        " ".join(sys.argv[1:])
-        if len(sys.argv) > 1
-        else "CV screening software for hiring"
-    )
+    args = sys.argv[1:]
+    workflow_only = False
+    if args and args[0] == "--workflow":
+        workflow_only = True
+        args = args[1:]
+
+    product = " ".join(args) if args else "CV screening software for hiring"
     env = load_env()
 
-    if env.get("OPENROUTER_API_KEY"):
+    if (not workflow_only) and env.get("OPENROUTER_API_KEY"):
         try:
-            print(agent_openrouter(product, env))
+            print(agent_openrouter(product, env, verbose=True))
             return
         except Exception as e:
             print(f"OpenRouter agent failed ({e}); falling back to workflow.\n")
 
+    print("Running deterministic WORKFLOW (not the free tool-calling agent):\n")
     print(json.dumps(workflow(product), indent=2, ensure_ascii=False))
 
 
