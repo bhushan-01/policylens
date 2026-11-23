@@ -1,0 +1,42 @@
+[
+  {
+    "id": "a1",
+    "question": "We build CV screening software for HR teams",
+    "expect_risk_keywords": ["high-risk", "high risk"],
+    "expect_citations_any": ["Annex III", "Article 6"],
+    "expect_date_any": ["2 December 2027", "December 2027"],
+    "expect_parents_any": ["annex_III", "art_6"]
+  },
+  {
+    "id": "a2",
+    "question": "Can I use AI to detect my employees' emotions at work?",
+    "expect_risk_keywords": ["prohibited", "ban"],
+    "expect_citations_any": ["Article 5"],
+    "expect_date_any": [],
+    "expect_parents_any": ["art_5"]
+  },
+  {
+    "id": "a3",
+    "question": "What are the transparency obligations for a customer-facing chatbot?",
+    "expect_risk_keywords": ["transparency"],
+    "expect_citations_any": ["Article 50"],
+    "expect_date_any": [],
+    "expect_parents_any": ["art_50"]
+  },
+  {
+    "id": "a4",
+    "question": "Remote biometric identification systems used in publicly accessible spaces for law enforcement",
+    "expect_risk_keywords": ["prohibited", "high-risk", "biometric"],
+    "expect_citations_any": ["Article 5", "Annex III"],
+    "expect_date_any": [],
+    "expect_parents_any": ["art_5", "annex_III"]
+  },
+  {
+    "id": "a5",
+    "question": "Is a pizza recommendation chatbot high-risk under the EU AI Act?",
+    "expect_risk_keywords": ["minimal", "not high-risk", "unlikely", "not sure", "does not appear"],
+    "expect_citations_any": [],
+    "expect_date_any": [],
+    "expect_parents_any": []
+  }
+]
