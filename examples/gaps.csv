@@ -1,0 +1,15 @@
+article,topic,status,what_buyers_expect,found_in
+Article 9,Risk management system,Missing,"A documented, continuously updated risk management process covering foreseeable misuse and residual risk.",
+Article 10,Data and data governance,Evidenced,"Training/validation/testing data provenance, bias examination and mitigation.",data_governance.md § 1; data_governance.md § 2; data_governance.md § 3
+Article 11,Technical documentation (Annex IV),Missing,Technical documentation drawn up before market placement and kept up to date (Annex IV contents).,
+Article 12,Record-keeping / automatic logging,Missing,"Automatic event logging over the system's lifetime, enabling traceability and monitoring.",
+Article 13,Transparency and instructions for use,Evidenced,"Instructions for use giving deployers the system's capabilities, limits, accuracy and oversight measures.",human_oversight.md § 3; product_overview.md § 2
+Article 14,Human oversight,Evidenced,"Design measures that let natural persons oversee, interpret, override or stop the system.",human_oversight.md § 2; human_oversight.md § 3; human_oversight.md § 1
+Article 15,"Accuracy, robustness, cybersecurity",Evidenced,"Declared accuracy metrics, robustness measures and cybersecurity controls.",security_and_accuracy.md § 2; security_and_accuracy.md § 1; security_and_accuracy.md § 3
+Article 17,Quality management system,Missing,"A written quality management system covering design, testing, change control and accountability.",
+Article 43,Conformity assessment,Missing,Status of the conformity assessment procedure followed before placing the system on the market.,
+Article 49,Registration in the EU database,Missing,Registration of the system in the EU database for high-risk systems.,
+Article 72,Post-market monitoring,Evidenced,A post-market monitoring plan that actively collects and analyses performance data over the lifetime.,security_and_accuracy.md § 3
+Article 73,Serious incident reporting,Missing,"A procedure to detect, investigate and report serious incidents to market surveillance authorities.",
+Article 4,AI literacy,Evidenced,Measures ensuring staff and deployers' operators have sufficient AI literacy.,human_oversight.md § 3
+Article 86,Right to explanation of individual decisions,Partial,Ability for deployers to give affected persons a clear explanation of the system's role in a decision.,human_oversight.md § 2

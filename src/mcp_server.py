@@ -121,6 +121,40 @@ def classify_product(product_description: str) -> str:
     )
 
 
+@mcp.tool()
+def scan_codebase(path: str) -> str:
+    """
+    Scan a code repository for EU AI Act red flags (emotion/biometric use, automated decisions
+    with no human step, missing logging, missing AI disclosure, protected attributes as features).
+    Every finding has file:line, a verified Article, why it matters, and a fix. Heuristic only.
+    """
+    import code_scan
+
+    return json.dumps(code_scan.scan(path), indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def evidence_gaps(docs_dir: str) -> str:
+    """
+    Check a folder of company docs (.md/.txt) against 14 buyer-expected AI Act obligations
+    (Art. 4, 9-15, 17, 43, 49, 72, 73, 86). Returns Evidenced/Partial/Missing per obligation
+    with the document passages found. Keyword triage, not a compliance finding.
+    """
+    from company import load_passages
+    from evidence_pack import gap_analysis
+
+    return json.dumps(gap_analysis(load_passages(docs_dir)), indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def verify_citations(text: str) -> str:
+    """Check every Article/Annex mentioned in `text` actually exists in the EU AI Act."""
+    import laws
+
+    cited = laws.extract_citations(text)
+    return json.dumps({"cited": sorted(cited), "nonexistent": sorted(c for c in cited if not laws.exists(c))})
+
+
 if __name__ == "__main__":
     # stdio transport for Cursor / Claude Desktop
     mcp.run()

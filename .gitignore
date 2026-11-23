@@ -33,3 +33,6 @@ data/eval_assertion_report.json
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Generated pack output (examples/ holds a committed sample)
+out/
