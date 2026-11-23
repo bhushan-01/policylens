@@ -14,7 +14,7 @@ with AI hiring / HR-tech vendors (Annex III point 4 is the clearest high-risk ca
 3. **Decide the stop rule now:** fewer than 5 of 15 have actually faced a questionnaire,
    or nobody has spent time or money on it → the pain is not sharp enough. Stop.
 4. **Show, don't tell** (only in the last 5 minutes): run the sample pack on their public
-   docs, or show `examples/evidence_pack.md`.
+   docs, or show `examples/sample_output/evidence_pack.md`.
 
 ## Interview script (30 min)
 

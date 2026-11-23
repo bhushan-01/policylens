@@ -7,11 +7,11 @@ request, and the design decisions behind the trust features.
 
 | Product | Question it answers | Entry point |
 |---|---|---|
-| Classifier | "What does the EU AI Act say about my AI product?" | `src/policylens.py`, web UI tab |
-| Evidence Pack | "How do I answer my customer's AI Act questionnaire, with proof?" | `src/evidence_pack.py`, web UI tab |
+| Classifier | "What does the EU AI Act say about my AI product?" | `policylens/checklist.py`, web UI tab |
+| Evidence Pack | "How do I answer my customer's AI Act questionnaire, with proof?" | `policylens/pack.py`, web UI tab |
 
-Supporting tools: code scanner (`src/code_scan.py`), MCP server (`src/mcp_server.py`), tool-calling
-agent (`src/agent.py`, a learning exercise).
+Supporting tools: code scanner (`policylens/scanner.py`), MCP server (`policylens/mcp_server.py`), tool-calling
+agent (`policylens/agent.py`, a learning exercise).
 
 Why the Evidence Pack exists: risk classification alone is already free (EU Commission checker,
 Future of Life Institute, TÜV SÜD). The paid pain is the buyer questionnaire an AI vendor must answer
@@ -22,11 +22,11 @@ Annex III point 4 is the clearest high-risk case.
 
 ```
 data/eu_ai_act.pdf          source law, Regulation (EU) 2024/1689
-data/ai_act_raw.txt         extracted text            (src/extract_text.py)
-data/ai_act_clean.txt       headers/footers removed   (src/clean_text.py)
-data/chunks.json            113 Articles + 13 Annexes (src/chunk.py)
-data/chunks_split.json      pieces <= 512 tokens      (src/split_chunks.py)
-data/embeddings.npy         one 384-d vector per piece (src/embed_chunks.py, BAAI/bge-small-en-v1.5)
+data/ai_act_raw.txt         extracted text            (policylens/ingest/extract_text.py)
+data/ai_act_clean.txt       headers/footers removed   (policylens/ingest/clean_text.py)
+data/chunks.json            113 Articles + 13 Annexes (policylens/ingest/chunk.py)
+data/chunks_split.json      pieces <= 512 tokens      (policylens/ingest/split_chunks.py)
+data/embeddings.npy         one 384-d vector per piece (policylens/ingest/embed_chunks.py, BAAI/bge-small-en-v1.5)
 ```
 
 Key facts that shaped the design:
@@ -39,20 +39,30 @@ Key facts that shaped the design:
 
 ## 3. Module map
 
+All code lives in the `policylens/` package. Run modules with `python -m policylens.<name>`.
+
 | Module | Responsibility |
 |---|---|
+| `paths.py`, `config.py` | Project locations independent of the working directory; `.env` loading |
 | `search.py` | Hybrid semantic search: embedding similarity plus a small keyword bonus, with parent diversification |
 | `laws.py` | Exact Article/Annex lookup, verbatim quotes, citation extraction and verification |
-| `obligations.py` | 14 buyer-expected obligations, each tied to a real Article, with document keywords |
 | `risk_rules.py` | 27 classification rules: all Annex III areas, all Article 5 bans, Article 50, GPAI |
+| `classification.py` | Applies the rules to a description, ignores stated exclusions, quotes the law, adds notes |
+| `obligations.py` | 14 buyer-expected obligations, each tied to a real Article, with document keywords |
 | `company.py` | Loads a vendor's `.md/.txt` documents as numbered passages; keyword and meaning search over them |
-| `evidence_pack.py` | The pipeline: classify, gap analysis, draft answers, verify, render |
+| `pack.py` | Evidence Pack pipeline: gap analysis, answer drafting, verification guards, CLI |
+| `render.py` | Markdown, HTML, JSON, CSV and the draft public position page |
 | `llm.py` | One wrapper for OpenRouter or Anthropic; JSON parsing tolerant of fences |
-| `code_scan.py` | Heuristic scanner for AI Act red flags in a code repository |
+| `omnibus.py` | Post-2024 date note (Digital Omnibus). Re-verify against the Official Journal |
+| `answer.py`, `checklist.py` | Classifier answer generation and its CLI (prohibited, high-risk, transparency checklist) |
+| `scanner.py` | Heuristic scanner for AI Act red flags in a code repository |
 | `mcp_server.py` | Exposes search, lookup, classify, scan, gaps and citation checks to editors |
-| `answer.py` | Classifier answer generation and the Omnibus date note |
-| `app.py` | Gradio UI with two tabs |
-| `eval_evidence.py` | 81 offline checks (see SAFETY_AND_LIMITS.md) |
+| `ui.py` | Gradio UI with two tabs |
+| `agent.py` | Tool-calling agent (learning exercise and hard cases) |
+| `ingest/` | One-time PDF to chunks to embeddings pipeline, plus a token-limit check |
+
+Tests live in `evals/` (`evidence.py` 83 offline checks, `retrieval.py`, `assertions.py`) with fixtures
+in `evals/fixtures/`. Demo inputs and a sample output live in `examples/`.
 
 ## 4. Evidence Pack data flow
 
@@ -88,7 +98,7 @@ heading are included in the searched text):
 This is keyword triage that shows where to look first. It is not a compliance finding, and the pack says so.
 
 ### Classification
-`classify_product` runs every rule in `risk_rules.py`. A rule matches when its regex matches the
+`classification.classify_product` first removes sentences that state what the product is NOT for (for example "not intended for promotion decisions"), then runs every rule in `risk_rules.py`. A rule matches when its regex matches the
 description (and its optional context regex, for example workplace words for the emotion ban).
 Precedence: prohibited, then high-risk, then transparency, then none. High-risk results also quote
 Article 6(2)/6(3) and the profiling caveat, plus the Omnibus date note. It flags and never clears.
@@ -116,7 +126,7 @@ Offline mode (no API key or `--no-llm`) never produces `ready`.
 
 ## 6. Code scanner
 
-`code_scan.scan(path)` walks source and docs (skipping `.git`, `.venv`, `node_modules`, `data`, etc.,
+`scanner.scan(path)` walks source and docs (skipping `.git`, `.venv`, `node_modules`, `data`, etc.,
 files under 300 KB) and applies regex rules. Each finding has: citation (asserted to exist in the Act),
 severity (critical, high, medium, low), rule id, `file:line`, why, and fix.
 
@@ -135,7 +145,7 @@ It is a smoke detector. Silence is not evidence of compliance.
 
 ## 7. MCP tools
 
-Run `python src/mcp_server.py` (stdio). Config example: `mcp_config.example.json`.
+Run `python -m policylens.mcp_server` (stdio, or `policylens-mcp` after `pip install -e .`). Config example: `mcp_config.example.json`.
 
 | Tool | Input | Output |
 |---|---|---|
@@ -162,8 +172,8 @@ With no key everything still runs in retrieval-only or offline mode.
 ## 9. Extending it
 
 - **Add an obligation:** append to `OBLIGATIONS` in `obligations.py` with a real Article, a plain
-  `ask`, and document `keywords`. Optionally add question phrases in `QUESTION_HINTS` in `evidence_pack.py`.
+  `ask`, and document `keywords`. Optionally add question phrases in `QUESTION_HINTS` in `pack.py`.
 - **Add a classification rule:** append to `RULES` in `risk_rules.py` with `id`, `tier`, `cite`, `rx`,
   a verbatim `marker`, and `why`. The evals fail if the marker is not in the Act.
-- **Add a scanner rule:** add a regex and a block in `code_scan.scan` using `add(...)`, which asserts the citation exists.
-- **Add an eval:** use `check(name, condition)` in `eval_evidence.py`.
+- **Add a scanner rule:** add a regex and a block in `scanner.scan` using `add(...)`, which asserts the citation exists.
+- **Add an eval:** use `check(name, condition)` in `evals/evidence.py`.

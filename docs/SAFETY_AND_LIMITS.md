@@ -12,14 +12,14 @@
 - Classification is a keyword first pass over the intended-purpose text. Unusual wording can be missed.
   It does not model every exception, delegated act or national rule.
 - The code scanner finds patterns, not behavior. It cannot see runtime data or deployment.
-- Dates: the Digital Omnibus delay dates come from the note in `src/answer.py`
+- Dates: the Digital Omnibus delay dates come from the note in `policylens/omnibus.py`
   (Annex III stand-alone systems 2 December 2027; Annex I product systems 2 August 2028).
   They were not verified against the Official Journal. Re-check before relying on them.
 - The law text is the 2024 PDF. Later amendments are not in the index.
 - Sending a vendor's real documents to an external LLM provider shares them with that provider.
   Use `--no-llm` or get consent first.
 
-## The 81 offline evals (`make test`)
+## The 83 offline evals (`make test`)
 
 No API key or network needed after the embedding model is cached.
 
@@ -27,14 +27,14 @@ No API key or network needed after the embedding model is cached.
 |---|---|
 | Citation checker | flags nonexistent Articles, flags real-but-unshown ones, accepts shown ones |
 | Rule markers | all 27 classification rules quote text that really exists in the Act |
-| Classification | 19 products: hiring, promotion, emotion at work, mall face recognition, police live recognition, credit, proctoring, grading, emergency triage, visa scoring, crime prediction, social scoring, face scraping, synthetic video, chatbot, and negatives (weather, lunch menu, inventory) |
+| Classification | exclusions ignored on the sample; 19 products: hiring, promotion, emotion at work, mall face recognition, police live recognition, credit, proctoring, grading, emergency triage, visa scoring, crime prediction, social scoring, face scraping, synthetic video, chatbot, and negatives (weather, lunch menu, inventory) |
 | Quotes and exceptions | mall camera quotes Annex III 1(a); verification exception note appears |
 | Gap analysis | known Missing (Art. 9, 11, 12, 17, 43, 49, 73) and Evidenced (Art. 10, 14, 15) on the sample company |
 | Offline pack | 14 questions parsed; nothing marked READY without an LLM; all consulted law exists |
 | Adversarial model | a mocked model invents logging, cites Article 999, makes a negative claim, fabricates a document reference. Each is caught |
 | Code scanner | detects all 7 planted problems; citations exist; critical sorted first; docs-only folder is clean |
 
-Older retrieval and assertion evals: `src/eval_retrieval.py`, `src/eval_assertions.py`.
+Older retrieval and assertion evals: `evals/retrieval.py`, `evals/assertions.py` (run `make test-all`).
 
 ## Observed model failures that shaped the guards
 On the first live run with a real model:

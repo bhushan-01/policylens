@@ -1,11 +1,11 @@
 {
   "mcpServers": {
     "policylens": {
-      "command": "/Users/bkakade/Documents/policylens/.venv/bin/python",
-      "args": ["/Users/bkakade/Documents/policylens/src/mcp_server.py"],
-      "cwd": "/Users/bkakade/Documents/policylens",
+      "command": "/ABSOLUTE/PATH/TO/policylens/.venv/bin/python",
+      "args": ["-m", "policylens.mcp_server"],
+      "cwd": "/ABSOLUTE/PATH/TO/policylens",
       "env": {
-        "OPENROUTER_API_KEY": "set-in-real-config-or-use-dotenv"
+        "OPENROUTER_API_KEY": "optional: or put it in .env"
       }
     }
   }

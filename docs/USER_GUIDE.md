@@ -8,7 +8,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env        # optional: add OPENROUTER_API_KEY or ANTHROPIC_API_KEY
-make test                   # should print 81/81 passed
+pip install -e . --no-deps
+make test                   # should print 83/83 passed
 ```
 
 No key? Everything still works offline. A key only improves the wording of drafted answers.
@@ -40,9 +41,9 @@ or a `.csv` with a column whose name contains "question".
 ### 3. Run it
 
 ```bash
-python src/evidence_pack.py --docs my_docs/ --questionnaire q.md --out out/
-python src/evidence_pack.py --docs my_docs/ --questionnaire q.md --no-llm     # deterministic
-python src/evidence_pack.py ... --product "override description for classification"
+python -m policylens.pack --docs my_docs/ --questionnaire q.md --out out/
+python -m policylens.pack --docs my_docs/ --questionnaire q.md --no-llm     # deterministic
+python -m policylens.pack ... --product "override description for classification"
 ```
 Or use the web UI: `make ui`, open the "Evidence Pack (for vendors)" tab, upload files.
 
@@ -75,7 +76,7 @@ The "Fix first" list in the report shows Missing and Partial obligations in prio
 ## B. Classify a product
 
 ```bash
-python src/policylens.py "We build CV screening software for HR teams"
+python -m policylens.checklist "We build CV screening software for HR teams"
 ```
 Prints a rule-based first pass with verbatim law quotes, then the checklist retrieval, then a cited
 LLM answer if a key is set. The web UI "Classify a product" tab shows the same.
@@ -83,8 +84,8 @@ LLM answer if a key is set. The web UI "Classify a product" tab shows the same.
 ## C. Scan a code repository
 
 ```bash
-python src/code_scan.py path/to/repo            # readable
-python src/code_scan.py path/to/repo --json     # for tooling
+python -m policylens.scanner path/to/repo            # readable
+python -m policylens.scanner path/to/repo --json     # for tooling
 ```
 Fix `critical` and `high` findings first. A scan with no findings does not mean compliant.
 
@@ -102,5 +103,5 @@ Fix `critical` and `high` findings first. A scan with no findings does not mean 
 | "unauthenticated requests to the HF Hub" | Harmless. Set `HF_TOKEN` to silence it |
 | Answers say `[DRAFT NEEDED]` | No API key or `--no-llm`. Add a key for drafted wording |
 | `llm_error` in the JSON | Network or parse failure. The pack falls back to offline drafts for that answer |
-| Gap says Missing but you wrote it | Use the buyer's vocabulary in your documents (see obligation keywords in `src/obligations.py`) |
+| Gap says Missing but you wrote it | Use the buyer's vocabulary in your documents (see obligation keywords in `policylens/obligations.py`) |
 | Classification says "No Annex III trigger" | Rules are keyword based. Describe the intended purpose plainly, or classify by reading Annex III |

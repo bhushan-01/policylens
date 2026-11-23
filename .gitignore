@@ -23,7 +23,7 @@ __pycache__/
 !.env.example
 
 # Generated eval reports
-data/eval_assertion_report.json
+evals/reports/
 
 # OS / editor
 .DS_Store
