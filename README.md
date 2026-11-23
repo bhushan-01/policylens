@@ -8,6 +8,19 @@ Describe an AI product → get **risk category**, **citations**, and **when it a
 
 Repo: https://github.com/bhushan-01/policylens
 
+## Documentation
+
+| Doc | What it covers |
+|---|---|
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Setup, running every tool, reading outputs, troubleshooting |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Data layer, modules, data flow, trust model, MCP tools, extending |
+| [docs/SAFETY_AND_LIMITS.md](docs/SAFETY_AND_LIMITS.md) | What is guaranteed, what is not, the 81 evals, privacy |
+| [docs/CUSTOMER_DISCOVERY.md](docs/CUSTOMER_DISCOVERY.md) | Interview script and stop rule for validating the business |
+| [docs/OUTREACH.md](docs/OUTREACH.md) | Finding and contacting the first 15 interviewees |
+| [AGENTS.md](AGENTS.md) | Instructions for Cursor / coding agents |
+| [CHANGELOG.md](CHANGELOG.md) | What changed |
+| [LEARNING.md](LEARNING.md), [KNOWLEDGE_BASE.md](KNOWLEDGE_BASE.md), [WHAT_IS_THIS.md](WHAT_IS_THIS.md) | Learning material |
+
 ---
 
 ## Pipeline
