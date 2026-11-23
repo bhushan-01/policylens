@@ -31,13 +31,14 @@ Also: a code scanner (`src/code_scan.py`) and an MCP server exposing both to edi
 | Ingest | extract_text.py, clean_text.py, chunk.py |
 | Index/search | split_chunks.py, embed_chunks.py, search.py |
 | Classifier | policylens.py, answer.py, classify.py, app.py |
-| Evidence Pack | evidence_pack.py, company.py, obligations.py, laws.py, llm.py |
+| Evidence Pack | evidence_pack.py, company.py, obligations.py, risk_rules.py, laws.py, llm.py |
 | Code scanner | code_scan.py |
 | Agent / MCP | agent.py, mcp_server.py (tools: search_law, get_article, classify_product, scan_codebase, evidence_gaps, verify_citations) |
-| Evals | eval_retrieval.py, eval_assertions.py, eval_evidence.py (39 checks, offline) |
+| Evals | eval_retrieval.py, eval_assertions.py, eval_evidence.py (81 checks, offline) |
 | Business | docs/CUSTOMER_DISCOVERY.md, docs/OUTREACH.md |
 
 ## Commands
+`make test | demo | demo-offline | scan | ui | mcp` wrap these:
 ```bash
 python src/evidence_pack.py --docs data/sample_company --questionnaire data/sample_questionnaire.md [--no-llm]
 python src/code_scan.py data/sample_repo
@@ -47,8 +48,8 @@ python src/mcp_server.py     # MCP over stdio (see mcp_config.example.json)
 ```
 
 ## Status
-- Done: ingest, split, embeddings, search, classifier, agent, MCP, evidence pack, code scanner, 39 evals.
-- Known gaps: classification keyword rules do not cover biometrics (Annex III point 1) or education/credit
-  use cases; gap status is keyword triage; no real customer has used it yet.
+- Done: ingest, split, embeddings, search, classifier, agent, MCP, evidence pack, code scanner, 81 evals.
+- Known gaps: classification is keyword rules (27, all Annex III areas + Art. 5 + Art. 50), so unusual wording
+  can be missed; gap status is keyword triage; no real customer has used it yet.
 - Next (business, not code): run the interviews in docs/CUSTOMER_DISCOVERY.md. Stop rule: <5 of 15 faced a real questionnaire.
 - Never commit `.env`. Do not send real customer documents to external APIs without consent.

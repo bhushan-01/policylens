@@ -41,10 +41,32 @@ def main():
         ("Customer support chatbot that answers FAQs", "TRANSPARENCY"),
         ("Weather forecasting model for farmers", "No Annex III"),
         ("Algorithm to decide promotion and termination of staff", "HIGH-RISK"),
+        ("Face recognition camera in a shopping mall", "HIGH-RISK"),
+        ("Live facial recognition used by police in public squares", "PROHIBITED"),
+        ("Credit scoring for consumer loans", "HIGH-RISK"),
+        ("AI proctoring that detects cheating during exams", "HIGH-RISK"),
+        ("Automated grading of student essays", "HIGH-RISK"),
+        ("Emergency call triage for ambulances", "HIGH-RISK"),
+        ("Visa application risk scoring for border control", "HIGH-RISK"),
+        ("Predicts which citizens will commit crime", "PROHIBITED"),
+        ("Social scoring of citizens by their behaviour", "PROHIBITED"),
+        ("Scrapes facial images from the internet to build a face database", "PROHIBITED"),
+        ("Generates synthetic video of people", "TRANSPARENCY"),
+        ("Selection of lunch menu items for the cafeteria", "No Annex III"),
+        ("Inventory forecasting for a warehouse", "No Annex III"),
     ]
     for desc, want in cases:
         tier = ep.classify_product(desc)["tier"]
         check(f"classify: {desc[:48]!r} -> {want}", want.lower() in tier.lower(), tier)
+    import re
+    from risk_rules import RULES
+    for r in RULES:  # a rule may only quote text the Act really contains
+        text = re.sub(r"\s+", " ", laws.get(r["cite"])["text"])
+        check(f"rules: marker for {r['id']} exists in {r['cite']}", r["marker"] in text)
+    mall = ep.classify_product("Face recognition camera in a shopping mall")
+    check("classify: mall camera cites Annex III 1(a) quote", any("remote biometric identification" in b["quote"] for b in mall["basis"]))
+    check("classify: face-unlock note about verification exception",
+          any("VERIFICATION" in n for n in ep.classify_product("Face recognition used to verify identity at login")["notes"]))
     hire = ep.classify_product("CV screening for recruiters")
     check("classify: quotes real Annex III text", any("recruitment or selection" in b["quote"] for b in hire["basis"]))
     check("classify: every basis cite exists in the Act", all(laws.exists(b["cite"]) for b in hire["basis"]))

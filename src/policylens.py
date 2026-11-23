@@ -37,7 +37,7 @@ def gather_evidence(product: str) -> dict:
             f"prohibited AI practices Article 5: {product}", top_k=4
         ),
         "high_risk": search(
-            f"Annex III high-risk recruitment hiring job applications employment: {product}",
+            f"Annex III high-risk AI systems areas biometrics education employment essential services law enforcement: {product}",
             top_k=5,
         ),
         "transparency": search(
@@ -86,6 +86,13 @@ def main():
     print("=" * 64)
     print(f"Product: {product}\n")
 
+    from evidence_pack import classify_product
+
+    first = classify_product(product)
+    print(f"Rule-based first pass: {first['tier']}")
+    for b in first["basis"]:
+        print(f"   - {b['cite']}: {b['why']}")
+    print()
     print("Running checklist (prohibited → high-risk → transparency)...\n")
     bundle = gather_evidence(product)
     print(format_evidence(bundle["steps"]))

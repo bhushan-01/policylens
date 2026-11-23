@@ -166,7 +166,7 @@ The Evidence Pack does that for AI hiring / HR-tech vendors (Annex III point 4).
 ```bash
 python src/evidence_pack.py --docs data/sample_company --questionnaire data/sample_questionnaire.md
 python src/evidence_pack.py ... --no-llm     # deterministic offline mode
-python src/eval_evidence.py                  # 39 safety evals, no API key needed
+python src/eval_evidence.py                  # 81 safety evals, no API key needed
 python src/code_scan.py data/sample_repo     # scan a codebase for AI Act red flags
 python src/app.py                            # web UI, "Evidence Pack" tab
 ```
@@ -176,7 +176,7 @@ Outputs (in `out/`): `evidence_pack.md|html|json`, `gaps.csv` (what to fix first
 A committed sample lives in `examples/` (fictional company).
 
 What it does:
-1. **Classifies** the product from verbatim Annex III / Article 5 / Article 6 text.
+1. **Classifies** the product with 27 rules covering every Annex III area, all Article 5 bans and Article 50 cases, quoting verbatim law text (`src/risk_rules.py`).
 2. **Gap analysis** against 14 buyer-expected obligations (Art. 4, 9-15, 17, 43, 49, 72, 73, 86):
    Evidenced / Partial / Missing, with the vendor document each one was found in.
 3. **Drafts questionnaire answers**: law facts only from retrieved Articles, company facts only
@@ -186,7 +186,7 @@ What it does:
    If an obligation has no supporting document, the answer is forced to NEEDS INPUT.
 
 Limits to know: gap status is keyword triage, not a compliance finding; classification is a
-first pass on the intended-purpose text; dates rely on the Omnibus note in `src/answer.py`
+keyword first pass on the intended-purpose text (it flags, never clears); dates rely on the Omnibus note in `src/answer.py`
 and must be re-checked against the Official Journal. Not legal advice.
 
 Business validation plan: [docs/CUSTOMER_DISCOVERY.md](docs/CUSTOMER_DISCOVERY.md).
@@ -200,3 +200,7 @@ Each finding has file:line, a verified Article, why, and a fix. The MCP server e
 `scan_codebase`, plus `evidence_gaps` and `verify_citations`, so Cursor or Claude Code can call them.
 
 Outreach and interview material: [docs/OUTREACH.md](docs/OUTREACH.md). Cursor instructions: [AGENTS.md](AGENTS.md).
+
+## Quick commands
+
+`make test` (81 offline evals) · `make demo` / `make demo-offline` · `make scan` · `make ui` · `make mcp`

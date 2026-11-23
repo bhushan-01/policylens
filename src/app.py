@@ -38,6 +38,12 @@ def run(product: str, top_k: int = 8) -> tuple[str, str]:
     ]
     evidence = "\n".join(evidence_lines)
 
+    from evidence_pack import classify_product
+
+    first = classify_product(product)
+    header = f"**Rule-based first pass: {first['tier']}**\n\n" + "\n".join(
+        f"- **{b['cite']}** — {b['why']}" + (f"\n  > {b['quote']}" if b["quote"] else "") for b in first["basis"]) + "\n\n---\n\n"
+
     env = load_env()
     try:
         if env.get("OPENROUTER_API_KEY") or env.get("ANTHROPIC_API_KEY"):
@@ -47,7 +53,7 @@ def run(product: str, top_k: int = 8) -> tuple[str, str]:
     except Exception as e:
         answer = f"Generation failed: {e}\n\nEvidence still available on the right."
 
-    return answer, evidence
+    return header + answer, evidence
 
 
 def run_pack(files, questionnaire, no_llm):

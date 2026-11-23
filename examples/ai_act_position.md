@@ -1,6 +1,6 @@
 # Acme Talent AI — EU AI Act position (DRAFT for counsel review)
 
-**Classification:** HIGH-RISK (Annex III, employment)
+**Classification:** HIGH-RISK (Annex III point 4(a), 4(b))
 
 ## What we already have in place
 

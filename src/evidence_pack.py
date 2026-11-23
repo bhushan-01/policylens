@@ -44,38 +44,54 @@ DISCLAIMER = ("Draft prepared from the vendor's own documents and the text of Re
 
 # ---------------------------------------------------------------- classification
 
-ANNEX_III_4A = re.compile(r"recruit|hiring|\bhire\b|candidate|applicant|\bcvs?\b|resume|résumé|job (ad|post|applic)|interview", re.I)
-ANNEX_III_4B = re.compile(r"promotion|terminat|performance (review|evaluation|monitor)|monitor(ing)? (employee|worker)|task allocation|workforce (monitor|analytics)", re.I)
-EMOTION = re.compile(r"emotion|sentiment of (employee|worker|candidate)|facial expression|stress level", re.I)
-CHATBOT = re.compile(r"chatbot|virtual assistant|conversational|talks? to (users|customers)", re.I)
+def _quote(cite: str, marker: str) -> str:
+    return laws.quote_around(cite, marker, 40, 330)
 
 
 def classify_product(description: str) -> dict:
-    """Rule-based first pass anchored on verbatim law text. Conservative: flags, never clears."""
-    basis, tier, notes = [], "Not determined by keyword rules (needs review)", []
+    """
+    Rule-based first pass over all Annex III areas, all Article 5 prohibitions and Article 50.
+    Every rule quotes verbatim law text. Conservative: it flags, it never clears a product.
+    """
+    from risk_rules import RULES
 
-    if EMOTION.search(description):
-        q = laws.quote_around("Article 5", "to infer emotions", 80, 330)
-        basis.append({"cite": "Article 5", "why": "Description mentions inferring emotions; Article 5(1)(f) prohibits this in the workplace and education, with a medical/safety exception.", "quote": q})
+    hits = [r for r in RULES if r["rx"].search(description) and (r.get("also") is None or r["also"].search(description))]
+    prohibited = [r for r in hits if r["tier"] == "P"]
+    high = [r for r in hits if r["tier"] == "H"]
+    transp = [r for r in hits if r["tier"] == "T"]
+    gpai = [r for r in hits if r["tier"] == "G"]
+    basis, notes = [], []
+
+    for r in prohibited + high + transp + gpai:
+        basis.append({"cite": r["cite"], "rule": r["id"], "why": r["why"], "quote": _quote(r["cite"], r["marker"])})
+
+    if prohibited:
         tier = "POSSIBLY PROHIBITED — urgent legal review"
-    if ANNEX_III_4A.search(description) or ANNEX_III_4B.search(description):
-        point = "4(a)" if ANNEX_III_4A.search(description) else "4(b)"
-        marker = "recruitment or selection of natural persons" if point == "4(a)" else "decisions affecting terms of work-related relationships"
-        basis.append({"cite": "Annex III", "why": f"Employment use case, Annex III point {point}.", "quote": laws.quote_around("Annex III", marker, 70, 330)})
-        basis.append({"cite": "Article 6", "why": "Article 6(2): Annex III systems are high-risk. Article 6(3) derogations do not apply where the system performs profiling of natural persons.",
+        notes.append("Prohibited practices (Article 5) carry the Act's highest penalties. Narrow exceptions exist; only counsel can confirm whether one applies.")
+    elif high:
+        points = ", ".join(sorted({r["id"][1:].replace("a", "(a)").replace("b", "(b)").replace("c", "(c)").replace("d", "(d)") for r in high}))
+        tier = f"HIGH-RISK (Annex III point {points})"
+    elif transp:
+        tier = "TRANSPARENCY obligations likely (Article 50)"
+    else:
+        tier = "No Annex III / Article 5 trigger found by keyword rules — likely minimal risk, confirm"
+
+    if high:
+        basis.append({"cite": "Article 6", "rule": "6(2)", "why": "Article 6(2): Annex III systems are high-risk. The Article 6(3) 'not high-risk' derogation does not apply where the system performs profiling of natural persons.",
                       "quote": laws.quote_around("Article 6", "Notwithstanding the first subparagraph", 0, 181)})
-        if not tier.startswith("POSSIBLY PROHIBITED"):
-            tier = "HIGH-RISK (Annex III, employment)"
-        notes.append("Ranking/scoring candidates generally involves profiling, so the Article 6(3) 'not high-risk' derogation should not be relied on without counsel.")
-    if not basis:
-        if CHATBOT.search(description):
-            basis.append({"cite": "Article 50", "why": "Interacts with people: transparency duties may apply.", "quote": laws.quote_around("Article 50", "informed that they are interacting", 120, 260)})
-            tier = "TRANSPARENCY obligations likely (Article 50)"
-        else:
-            tier = "No Annex III / Article 5 trigger found by keyword rules — likely minimal risk, confirm"
-    if any(b["cite"] == "Annex III" for b in basis):
+        notes.append("Ranking, scoring or predicting things about people generally counts as profiling, so do not rely on the Article 6(3) derogation without counsel.")
         notes.append(OMNIBUS_NOTE)
-    return {"tier": tier, "basis": basis, "notes": notes, "disclaimer": "Keyword first-pass; verify the intended purpose against Annex III wording."}
+    ids = {r["id"] for r in hits}
+    if "A1a" in ids and re.search(r"verif|unlock|authenticat|log.?in", description, re.I):
+        notes.append("Annex III 1(a) excludes biometric VERIFICATION whose sole purpose is confirming a person is who they claim to be. Confirm yours is verification only.")
+    if "A5b" in ids and re.search(r"fraud", description, re.I):
+        notes.append("Annex III 5(b) excepts systems used to detect financial fraud. Credit scoring itself stays high-risk.")
+    if high and transp:
+        notes.append("Article 50 transparency duties apply in addition to the high-risk requirements.")
+    if gpai:
+        notes.append("If you train a general-purpose AI model you may be a provider under Article 53. Using someone else's model makes you a downstream provider or deployer instead.")
+    return {"tier": tier, "basis": basis, "notes": notes, "rule_ids": sorted(ids),
+            "disclaimer": "Keyword first pass; verify the intended purpose against the Annex III / Article 5 wording."}
 
 
 # ---------------------------------------------------------------- gap analysis

@@ -1,19 +1,21 @@
 # AI Act Evidence Pack — Acme Talent AI
 
-_Generated 2026-11-22 · mode: LLM-assisted_
+_Generated 2026-11-23 · mode: LLM-assisted_
 
 > Draft prepared from the vendor's own documents and the text of Regulation (EU) 2024/1689. Not legal advice. Have qualified counsel review before sending to a customer.
 
 ## 1. Risk classification
 
-**HIGH-RISK (Annex III, employment)**
+**HIGH-RISK (Annex III point 4(a), 4(b))**
 
-- **Annex III** — Employment use case, Annex III point 4(a).
-  > “access to self-employment: (a) AI systems intended to be used for the recruitment or selection of natural persons, in particular to place targeted job advertisements, to analyse and filter job applications, and to evaluate candidates; (b) AI systems intended to be used to make decisions affecting terms of work-related relationships, the promotion or termination of work-related contractual relation”
-- **Article 6** — Article 6(2): Annex III systems are high-risk. Article 6(3) derogations do not apply where the system performs profiling of natural persons.
+- **Annex III** — Annex III point 4(a): recruitment and selection.
+  > “AI systems intended to be used for the recruitment or selection of natural persons, in particular to place targeted job advertisements, to analyse and filter job applications, and to evaluate candidates; (b) AI systems intended to be used to make decisions affecting terms of work-related relationships, the promotion or termination of work-related contractual relation”
+- **Annex III** — Annex III point 4(b): decisions on work relationships, promotion, termination, monitoring.
+  > “AI systems intended to be used to make decisions affecting terms of work-related relationships, the promotion or termination of work-related contractual relationships, to allocate tasks based on individual behaviour or personal traits or characteristics or to monitor and evaluate the performance and behaviour of persons in such relationships. 5. Access to and enjoyme”
+- **Article 6** — Article 6(2): Annex III systems are high-risk. The Article 6(3) 'not high-risk' derogation does not apply where the system performs profiling of natural persons.
   > “Notwithstanding the first subparagraph, an AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons. 4”
 
-_Ranking/scoring candidates generally involves profiling, so the Article 6(3) 'not high-risk' derogation should not be relied on without counsel._
+_Ranking, scoring or predicting things about people generally counts as profiling, so do not rely on the Article 6(3) derogation without counsel._
 
 _IMPORTANT DATE UPDATES (EU Digital Omnibus on AI, 2026 — not in the 2024 PDF text):
 - Stand-alone high-risk systems (Annex III / Article 6(2)): apply from 2 December 2027
@@ -59,7 +61,7 @@ Always mention these updated dates when discussing when high-risk obligations ap
 
 **[READY]**
 
-Yes, our AI system is classified as high-risk under the EU AI Act. The system is intended to be used to analyse and filter job applications and evaluate candidates for open roles [doc: product_overview.md § 2], which falls under Annex III point (a) as an AI system intended for recruitment or selection of natural persons, specifically to analyse and filter job applications and evaluate candidates (Annex III). Because the system is placed on the EU market [doc: product_overview.md § 4] and matches the Annex III use case, it is classified as high-risk pursuant to Article 6(2). The high-risk obligations for stand-alone Annex III systems apply from 2 December 2027 under the updated EU Digital Omnibus timeline.
+Yes, our AI system is classified as high-risk under the EU AI Act. The system is intended to analyse and filter job applications and evaluate candidates for open roles [doc: product_overview.md § 2], which falls directly under Annex III as an AI system intended "to analyse and filter job applications, and to evaluate candidates" (Annex III). Because it meets the conditions in Article 6(2) for stand-alone high-risk systems listed in Annex III, the full requirements of the Act apply to us. Under the EU Digital Omnibus amendments, these obligations take effect from 2 December 2027.
 
 _Law consulted: Article 86, Article 2, Article 6, Article 80, Article 23, Article 24, Annex III. Company docs consulted: human_oversight.md § 2, product_overview.md § 4, product_overview.md § 3, product_overview.md § 2._
 
@@ -67,7 +69,7 @@ _Law consulted: Article 86, Article 2, Article 6, Article 80, Article 23, Articl
 
 **[READY]**
 
-The system is intended to help recruiters analyse and filter job applications and evaluate candidates for open roles [doc: product_overview.md § 2]. We explicitly exclude its use for promotion decisions, termination decisions, or employee performance monitoring [doc: product_overview.md § 2]. This scope aligns with the EU AI Act's requirement that instructions for use specify the system's intended purpose (Article 13(3)(b)(i)).
+The system is intended to help recruiters analyse and filter job applications and evaluate candidates for open roles [doc: product_overview.md § 2]. We explicitly exclude use of the system for promotion decisions, termination decisions, or employee performance monitoring [doc: product_overview.md § 2]. This intended purpose and these exclusions are communicated to deployers during onboarding and in written user guides, in line with the transparency obligations under Article 13(3)(b)(i).
 
 _Law consulted: Article 13. Company docs consulted: human_oversight.md § 3, product_overview.md § 2, security_and_accuracy.md § 2, product_overview.md § 3._
 
@@ -85,9 +87,9 @@ _Law consulted: Article 14, Article 14. Company docs consulted: human_oversight.
 
 **[NEEDS INPUT]**
 
-[NEEDS INPUT: whether the system automatically records events (logs) as required by Article 12, what events are logged, and the retention period for those logs]. Article 12 requires high-risk AI systems to technically allow automatic recording of events over the system's lifetime, capturing situations that may present risks, supporting post-market monitoring, and enabling operational oversight. The company evidence describes data retention for candidate records (12 months after requisition closure) [doc: data_governance.md § 3] and monitoring of override rates and score distributions [doc: security_and_accuracy.md § 3], but does not address automatic event logging or log retention periods. We need to document our logging capabilities, the specific events captured, and how long system logs are retained to demonstrate compliance with Article 12.
+[NEEDS INPUT: whether the system automatically records events (logs) as required by Article 12, what events are logged, and the retention period for those logs]. Article 12 requires high-risk AI systems to technically allow automatic recording of events over the system's lifetime, capturing situations that may present risks, supporting post-market monitoring, and enabling operational oversight. The company evidence describes data retention for candidate records (12 months after requisition closure) [doc: data_governance.md § 3] and monitoring of override rates and score distributions [doc: security_and_accuracy.md § 3], but does not address system event logging or log retention periods. We need to document our logging capabilities, the specific events captured, and how long those logs are retained to demonstrate compliance with Article 12.
 
-Missing: Whether the system implements automatic event logging as required by Article 12; What specific events are logged (e.g., system decisions, user interactions, errors, data inputs); The retention period for system event logs; How logs support identification of risks, post-market monitoring, and operational oversight
+Missing: Whether the system automatically records events (logs) as required by Article 12; What specific events are logged (e.g., inputs, outputs, decisions, overrides, errors); Log retention period and policy; Technical logging capabilities and infrastructure
 
 _Law consulted: Article 12, Article 12. Company docs consulted: data_governance.md § 3, human_oversight.md § 3, security_and_accuracy.md § 3, security_and_accuracy.md § 2._
 
@@ -95,9 +97,9 @@ _Law consulted: Article 12, Article 12. Company docs consulted: data_governance.
 
 **[NEEDS INPUT]**
 
-We govern training data through documented practices covering source, collection date, and licensing [doc: data_governance.md § 1]. Our ranking model is trained on anonymised historical application and hiring outcome data from consenting customers and a licensed public job-posting corpus [doc: data_governance.md § 1]. For bias testing, we evaluate the model quarterly for score disparities across gender and age groups using a held-out test set with inferred demographic labels; results are reviewed by the ML lead, and the most recent review confirmed the selection-rate ratio remained within our internal threshold of 0.8 [doc: data_governance.md § 2]. [NEEDS INPUT: documentation of design choices, data preparation operations (annotation, labelling, cleaning), formulation of assumptions about what the data measures, assessment of data quantity and suitability, measures to prevent and mitigate identified biases, and identification of data gaps as required by Article 10(2)(a), (c), (d), (e), (g), and (h)].
+We govern training data through documented practices covering source, collection date, and licensing for all datasets—anonymised customer hiring records and a public job-posting corpus [doc: data_governance.md § 1]. Data preparation, retention (12 months post-requisition), and field minimisation are controlled [doc: data_governance.md § 3]. For bias testing, we run quarterly evaluations measuring score disparities across gender and age groups on a held-out test set with inferred demographic labels; the ML lead reviews results against an internal 0.8 selection-rate-ratio threshold [doc: data_governance.md § 2]. These practices address the data governance (Article 10(2)(a)–(e)) and bias examination and mitigation requirements (Article 10(2)(f)–(g)) that apply to high-risk AI systems from 2 December 2027.
 
-Missing: Documentation of design choices for training, validation and testing datasets (Article 10(2)(a)); Data preparation processing operations such as annotation, labelling, cleaning, updating, enrichment and aggregation (Article 10(2)(c)); Formulation of assumptions about what the data measures and represents (Article 10(2)(d)); Assessment of availability, quantity and suitability of datasets (Article 10(2)(e)); Measures to detect, prevent and mitigate identified biases beyond quarterly testing (Article 10(2)(g)); Identification of data gaps or shortcomings and how they are addressed (Article 10(2)(h))
+Missing: Documented design choices and assumptions about what the data measure and represent (Article 10(2)(a), (d)); Specific data-preparation operations: annotation, labelling, cleaning, updating, enrichment, aggregation processes (Article 10(2)(c)); Assessment of data quantity and suitability for compliance (Article 10(2)(e)); Identification of data gaps or shortcomings and remediation plan (Article 10(2)(h)); Measures to detect and prevent (not only test for) biases, and mitigation actions taken when disparities are found (Article 10(2)(g))
 
 _Law consulted: Article 10, Article 10. Company docs consulted: data_governance.md § 1, data_governance.md § 2, data_governance.md § 3, human_oversight.md § 3._
 
@@ -105,9 +107,9 @@ _Law consulted: Article 10, Article 10. Company docs consulted: data_governance.
 
 **[NEEDS INPUT]**
 
-We declare NDCG@10 (Normalized Discounted Cumulative Gain at rank 10) as our primary accuracy metric, measured against recruiter shortlists on a held-out test set [doc: security_and_accuracy.md § 1]. The current model achieves 0.81 NDCG@10, and we re-run this evaluation before every model release [doc: security_and_accuracy.md § 1]. We also monitor recruiter override rates and score distributions monthly to detect performance drift [doc: security_and_accuracy.md § 3], and conduct quarterly bias evaluations measuring score disparities across gender and age groups [doc: data_governance.md § 2]. [NEEDS INPUT: confirmation that these metrics and measurement methods are documented in the instructions of use as required by Article 15(3)].
+We declare NDCG@10 (Normalized Discounted Cumulative Gain at rank 10) as our primary accuracy metric, measured against recruiter shortlists on a held-out test set [doc: security_and_accuracy.md § 1]. The current model achieves 0.81 NDCG@10, and we re-run this evaluation before every model release [doc: security_and_accuracy.md § 1]. We also monitor recruiter override rates and score distributions monthly to detect performance drift [doc: security_and_accuracy.md § 3], and conduct quarterly bias evaluations measuring score disparities across gender and age groups [doc: data_governance.md § 2]. [NEEDS INPUT: confirmation that these metrics and measurement methods are formally declared in the instructions of use as required by Article 15(3)].
 
-Missing: Confirmation that NDCG@10 and the measurement methodology are declared in the instructions of use accompanying the system
+Missing: Confirmation that NDCG@10 and the measurement methodology are formally declared in the instructions of use accompanying the system, as required by Article 15(3)
 
 _Law consulted: Article 15, Article 15. Company docs consulted: security_and_accuracy.md § 2, security_and_accuracy.md § 1, security_and_accuracy.md § 3, data_governance.md § 2._
 
@@ -117,7 +119,7 @@ _Law consulted: Article 15, Article 15. Company docs consulted: security_and_acc
 
 We encrypt data in transit and at rest, enforce role-based access control with single sign-on, and conduct an external penetration test annually [doc: security_and_accuracy.md § 2]. A SOC 2 Type II report is available to customers under NDA [doc: security_and_accuracy.md § 2]. We monitor recruiter override rates and score distributions monthly to detect performance drift [doc: security_and_accuracy.md § 3]. [NEEDS INPUT: technical measures to prevent, detect, respond to, or control AI-specific attacks such as data poisoning, model poisoning, adversarial examples, model evasion, confidentiality attacks, or model flaws, as required by Article 15(5)].
 
-Missing: Technical solutions to address AI-specific vulnerabilities: data poisoning prevention/detection, model poisoning controls, adversarial example defences, model evasion protections, confidentiality attack safeguards, and model flaw resolution procedures (Article 15(5))
+Missing: Technical solutions to address AI-specific vulnerabilities: data poisoning prevention/detection, model poisoning controls, adversarial example defenses, model evasion protections, confidentiality attack safeguards, and model flaw resolution procedures (Article 15(5))
 
 _Law consulted: Article 15, Article 15. Company docs consulted: security_and_accuracy.md § 2, security_and_accuracy.md § 1, security_and_accuracy.md § 3, product_overview.md § 2._
 
@@ -125,9 +127,13 @@ _Law consulted: Article 15, Article 15. Company docs consulted: security_and_acc
 
 **[NEEDS INPUT]**
 
-[NEEDS INPUT: complete Annex IV technical documentation package]. Article 11 requires that we draw up and maintain technical documentation before placing a high-risk AI system on the market, covering all elements listed in Annex IV (including general system description, detailed design and development process, data governance measures, risk management, testing and validation records, and human oversight mechanisms). The NOTICE indicates that no document in our current evidence covers the full Annex IV technical documentation. While we have implemented several relevant controls—including security measures [doc: security_and_accuracy.md § 2], human oversight features [doc: human_oversight.md § 2] [doc: human_oversight.md § 3], and data governance practices [doc: data_governance.md § 3]—we cannot confirm that a complete, consolidated technical documentation package meeting all Annex IV requirements has been prepared or is available for sharing.
+[NEEDS INPUT: technical documentation package as specified in Annex IV]. Under Article 11, providers of high-risk AI systems must draw up and maintain technical documentation before placing the system on the market, covering all elements listed in Annex IV to demonstrate compliance with the Act's requirements. The automated review indicates we do not currently have a consolidated technical documentation file meeting Annex IV's structure. We do maintain certain underlying records—security controls and SOC 2 reporting [doc: security_and_accuracy.md § 2], human oversight mechanisms and training materials [doc: human_oversight.md § 2] [doc: human_oversight.md § 3], and data governance policies [doc: data_governance.md § 3]—but these have not been assembled into the formal Annex IV package required by Article 11. If our system is classified as high-risk, we will need to complete and be able to share that documentation in accordance with the applicable timeline (2 December 2027 for stand-alone systems under Annex III, or 2 August 2028 for systems in regulated products under Annex I).
 
-Missing: Complete Annex IV technical documentation package as required by Article 11; Confirmation that technical documentation was drawn up before market placement; General description of the AI system and its intended purpose (Annex IV element); Detailed design, development process, and architecture documentation; Complete data governance and training/validation dataset documentation; Risk management system documentation; Full testing, validation, and performance metrics records; Cybersecurity measures documentation; Quality management system documentation; Process for maintaining technical documentation up-to-date
+Missing: Complete technical documentation package structured according to Annex IV requirements; Confirmation of AI system's risk classification and applicable compliance timeline; Policy on sharing technical documentation with customers and authorities
+
+⚠ negative claim (e.g. 'we do not…'): documents rarely prove absence — confirm it is true
+
+⚠ forward commitment: confirm you actually intend to promise this
 
 _Law consulted: Article 11, Article 11. Company docs consulted: security_and_accuracy.md § 2, human_oversight.md § 3, data_governance.md § 3, human_oversight.md § 2._
 
@@ -135,9 +141,9 @@ _Law consulted: Article 11, Article 11. Company docs consulted: security_and_acc
 
 **[NEEDS INPUT]**
 
-[NEEDS INPUT: conformity assessment procedure not yet documented]. Under Article 43, providers of high-risk AI systems must complete a conformity assessment—either internal control (Annex VI) or assessment involving a notified body (Annex VII)—before affixing CE marking. The obligation applies from 2 December 2027 for stand-alone high-risk systems (Annex III) or 2 August 2028 for systems embedded in regulated products (Annex I). We have not yet initiated the formal conformity assessment process or obtained CE marking.
+[NEEDS INPUT: conformity assessment procedure not yet documented]. Under Article 43, high-risk AI systems must complete a conformity assessment—either internal control (Annex VI) or third-party assessment with a notified body (Annex VII)—before affixing CE marking. The procedure depends on whether harmonised standards or common specifications have been applied. For stand-alone high-risk systems listed in Annex III, these obligations apply from 2 December 2027; for systems embedded in regulated products (Annex I), from 2 August 2028. We have not yet initiated the formal conformity assessment process or obtained CE marking.
 
-Missing: Which conformity assessment procedure (Annex VI internal control or Annex VII notified-body assessment) the vendor has selected or intends to follow; Whether harmonised standards (Article 40) or common specifications (Article 41) have been applied; Current status and timeline of the conformity assessment (not started, in progress, completed); Whether CE marking has been affixed and EU declaration of conformity drawn up; If using Annex VII, which notified body has been or will be engaged
+Missing: Which conformity assessment procedure (Annex VI internal control or Annex VII notified-body assessment) has been selected or completed; Whether harmonised standards (Article 40) or common specifications (Article 41) have been applied; Current status of technical documentation compilation for conformity assessment; Whether a notified body has been engaged (if Annex VII route chosen); Timeline for completing conformity assessment and affixing CE marking; CE marking status and declaration of conformity
 
 _Law consulted: Article 43. Company docs consulted: data_governance.md § 2, security_and_accuracy.md § 1, security_and_accuracy.md § 2, human_oversight.md § 3._
 
@@ -147,7 +153,7 @@ _Law consulted: Article 43. Company docs consulted: data_governance.md § 2, sec
 
 [NEEDS INPUT: serious incident reporting procedure]. Under Article 73, providers of high-risk AI systems placed on the Union market must report any serious incident to the market surveillance authorities of the Member State where it occurred, then perform necessary investigations including a risk assessment and corrective action without altering the system in a way that may affect subsequent evaluation of causes. No company documentation describing our incident reporting procedure, investigation protocol, or authority notification process has been provided.
 
-Missing: Serious incident reporting procedure: how incidents are identified, escalated, and reported to market surveillance authorities; Definition of 'serious incident' used internally and criteria for triggering a report; Investigation protocol following a serious incident, including risk assessment and corrective action steps; Process for cooperating with competent authorities and notified bodies during investigations; Safeguards to preserve the AI system state prior to authority notification to enable subsequent evaluation
+Missing: Serious incident reporting procedure: how incidents are identified, documented, and reported to market surveillance authorities; Definition of what constitutes a 'serious incident' in our context; Investigation protocol following a serious incident, including risk assessment and corrective action steps; Process for cooperating with competent authorities and notified bodies during investigations; Safeguards to preserve the AI system state for subsequent evaluation before any alterations
 
 _Law consulted: Article 73, Article 73. Company docs consulted: human_oversight.md § 2, product_overview.md § 2, data_governance.md § 1, human_oversight.md § 3._
 
@@ -155,9 +161,9 @@ _Law consulted: Article 73, Article 73. Company docs consulted: human_oversight.
 
 **[NEEDS INPUT]**
 
-We monitor post-deployment performance through monthly tracking of recruiter override rates and score distributions to detect drift [doc: security_and_accuracy.md § 3]. Our ML lead reviews these metrics on a dashboard [doc: security_and_accuracy.md § 3]. We also measure ranking quality (NDCG@10) against recruiter shortlists on held-out test data before each model release [doc: security_and_accuracy.md § 1]. [NEEDS INPUT: Article 72 requires active and systematic collection and analysis of relevant data on performance throughout the system's lifetime and evaluation of continuous compliance with Chapter III Section 2 requirements; we need evidence of a formal post-market monitoring plan, documented data sources beyond override rates, systematic compliance evaluation procedures, and analysis of interaction with other AI systems where relevant.]
+We monitor post-deployment performance through monthly tracking of recruiter override rates and score distributions to detect drift [doc: security_and_accuracy.md § 3]. Our ML lead reviews these metrics on a dashboard [doc: security_and_accuracy.md § 3]. We also measure ranking quality (NDCG@10) against recruiter shortlists on held-out test data before each model release [doc: security_and_accuracy.md § 1]. [NEEDS INPUT: Article 72(2) requires active and systematic collection and analysis of relevant data on performance throughout the system's lifetime and evaluation of continuous compliance with Chapter III Section 2 requirements; we need evidence of a formal post-market monitoring plan, documented data sources beyond override rates, systematic compliance evaluation procedures, and any analysis of interaction with other AI systems.]
 
-Missing: Formal post-market monitoring plan as required by Article 72; Documentation of all data sources systematically collected for performance monitoring; Procedures for evaluating continuous compliance with Chapter III Section 2 requirements; Analysis of interaction with other AI systems (if relevant); Systematic documentation and analysis framework for collected performance data
+Missing: Formal post-market monitoring plan as required by Article 72; Documentation of all data sources systematically collected for performance monitoring; Procedures for evaluating continuous compliance with Chapter III Section 2 requirements; Analysis of interaction with other AI systems (if relevant); Frequency and scope of systematic performance data analysis beyond monthly override tracking
 
 _Law consulted: Article 72. Company docs consulted: security_and_accuracy.md § 3, human_oversight.md § 2, human_oversight.md § 3, security_and_accuracy.md § 1._
 
@@ -165,17 +171,17 @@ _Law consulted: Article 72. Company docs consulted: security_and_accuracy.md § 
 
 **[NEEDS INPUT]**
 
-[NEEDS INPUT: registration status in the EU database under Article 49]. Our system is a CV screening and candidate ranking tool that analyses and filters job applications and evaluates candidates [doc: product_overview.md § 1]. This falls under Annex III point 4(a) as an AI system intended for recruitment or selection of natural persons, making it high-risk (Article 6). Providers of high-risk systems listed in Annex III must register before placing on the market, though the registration obligation for stand-alone high-risk systems applies from 2 December 2027 under the updated timeline. We have placed the system on the EU market [doc: product_overview.md § 4].
+[NEEDS INPUT: registration status in the EU database for high-risk AI systems]. Under Article 49, providers of high-risk AI systems listed in Annex III must register before placing the system on the market. Our system is a CV screening and candidate ranking tool used for recruitment and selection of natural persons [doc: product_overview.md § 1], which falls under Annex III as a high-risk use case. The registration obligation for stand-alone high-risk systems applies from 2 December 2027. We require confirmation of whether registration has been completed or is planned before that deadline.
 
-Missing: Whether the system has been registered in the EU database for high-risk AI systems (Article 49); Registration reference number or confirmation if applicable; Timeline for registration if the system was placed on market before 2 December 2027
+Missing: Whether the system has been registered in the EU database for high-risk AI systems (Article 49); Registration timeline and planned compliance date relative to the 2 December 2027 deadline; Registration reference number or confirmation of submission, if already completed
 
-_Law consulted: Article 49, Article 49, Annex III, Article 6. Company docs consulted: product_overview.md § 4, data_governance.md § 1, product_overview.md § 1, product_overview.md § 3._
+_Law consulted: Article 49, Article 49, Annex III, Annex III, Article 6. Company docs consulted: product_overview.md § 4, data_governance.md § 1, product_overview.md § 1, product_overview.md § 3._
 
 ### Q13. Can our recruiters explain a ranking decision to an affected candidate?
 
 **[READY]**
 
-Yes. Article 86 grants any affected person subject to a deployer decision based on high-risk AI output the right to obtain clear and meaningful explanations of the AI system's role and the main elements of the decision. Our system displays the top factors behind each candidate's score and a confidence indicator on the candidate card [doc: human_oversight.md § 2], enabling recruiters to interpret the output and provide those explanations. Because every rejection requires explicit recruiter confirmation [doc: human_oversight.md § 1], the recruiter remains the decision-maker and can explain both the AI's contribution and their own judgment.
+Yes. Article 86 grants any affected person subject to a deployer decision based on high-risk AI output the right to obtain clear and meaningful explanations of the AI system's role and the main elements of the decision. Our system displays the top factors behind each candidate's score and a confidence indicator on the candidate card [doc: human_oversight.md § 2], enabling recruiters to explain both the model's contribution and their own judgment. Because every rejection requires explicit recruiter confirmation [doc: human_oversight.md § 1], the recruiter remains the decision-maker and can provide the explanation Article 86 requires.
 
 _Law consulted: Article 86. Company docs consulted: human_oversight.md § 2, human_oversight.md § 1, data_governance.md § 1, product_overview.md § 2._
 
