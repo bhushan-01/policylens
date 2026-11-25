@@ -7,7 +7,8 @@ Two products share one law index:
 2. **Evidence Pack**: AI hiring/HR-tech vendors answer a buyer's AI Act questionnaire from their own
    documents (`policylens/pack.py`). This is the business direction. Classification alone is free
    elsewhere; the paid pain is the questionnaire.
-Also: a code scanner (`policylens/scanner.py`) and an MCP server exposing both to editors.
+Also: a code scanner (`policylens/scanner.py`), an Evidence Tribunal (`policylens/tribunal.py`)
+that replaces the free-form agent with an adversarial proof ledger, and an MCP server.
 
 ## Golden rules (never break these)
 - No claim without a citation. If evidence is weak, say "not sure" or `[NEEDS INPUT]`.
@@ -34,7 +35,8 @@ Also: a code scanner (`policylens/scanner.py`) and an MCP server exposing both t
 | Classifier product | checklist.py, answer.py, omnibus.py, ui.py |
 | Evidence Pack | pack.py, render.py, company.py, obligations.py, llm.py |
 | Code scanner | scanner.py |
-| Agent / MCP | agent.py, mcp_server.py (tools: search_law, get_article, classify_product, scan_codebase, evidence_gaps, verify_citations) |
+| Tribunal / MCP | tribunal.py (agent.py redirects here), mcp_server.py (tools: search_law, get_article, classify_product, evidence_tribunal, scan_codebase, evidence_gaps, verify_citations) |
+| Fix-first blueprints | blueprint.py |
 | Evals | evals/evidence.py (83 offline checks), evals/retrieval.py, evals/assertions.py; fixtures in evals/fixtures/ |
 | Demo inputs | examples/sample_company, sample_questionnaire.md, sample_repo, sample_output |
 | Business | docs/BUSINESS_PLAN.md, docs/CUSTOMER_DISCOVERY.md, docs/OUTREACH.md |
@@ -53,8 +55,8 @@ python -m policylens.mcp_server     # MCP over stdio (see mcp_config.example.jso
 ```
 
 ## Status
-- Done: ingest, split, embeddings, search, classifier, agent, MCP, evidence pack, code scanner, 83 evals.
-- Known gaps: classification is keyword rules (27, all Annex III areas + Art. 5 + Art. 50), so unusual wording
-  can be missed; gap status is keyword triage; no real customer has used it yet.
+- Done: ingest, split, embeddings, search, classifier, Evidence Tribunal, MCP, evidence pack,
+  code scanner, blueprints, landing page, Docker UI image, offline evals.
+- Known gaps: gap *status* is still keyword triage (semantic is advisory only); no real customer yet.
 - Next (business, not code): run the interviews in docs/CUSTOMER_DISCOVERY.md. Stop rule: <5 of 15 faced a real questionnaire.
 - Never commit `.env`. Do not send real customer documents to external APIs without consent.

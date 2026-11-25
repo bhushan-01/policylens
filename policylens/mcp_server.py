@@ -2,7 +2,7 @@
 Phase 4: PolicyLens MCP server.
 
 Exposes tools to Cursor / Claude Code / Claude Desktop:
-- search_law, get_article, classify_product
+- search_law, get_article, classify_product, evidence_tribunal
 - scan_codebase, evidence_gaps, verify_citations
 
 Run (stdio), from the project root or after `pip install -e .`:
@@ -142,10 +142,25 @@ def evidence_gaps(docs_dir: str) -> str:
 @mcp.tool()
 def verify_citations(text: str) -> str:
     """Check every Article/Annex mentioned in `text` actually exists in the EU AI Act."""
-    import laws
+    from policylens import laws
 
     cited = laws.extract_citations(text)
     return json.dumps({"cited": sorted(cited), "nonexistent": sorted(c for c in cited if not laws.exists(c))})
+
+
+@mcp.tool()
+def evidence_tribunal(product_description: str, promote_semantic: bool = False) -> str:
+    """
+    Adversarial Evidence Tribunal: Prosecutor → Defense → Citation Auditor → Verdict.
+    Returns a proof ledger. Only VERIFIED/CHALLENGED charges survive. Not legal advice.
+    """
+    from policylens.tribunal import run_tribunal
+
+    return json.dumps(
+        run_tribunal(product_description, promote_semantic=bool(promote_semantic)),
+        indent=2,
+        ensure_ascii=False,
+    )
 
 
 def main():

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 Evidence Tribunal + hardening
+- Replaced the free-form tool-calling agent with an **Evidence Tribunal**
+  (Prosecutor → Defense → Citation Auditor → proof ledger). `python -m policylens.agent`
+  now redirects here; new CLI: `policylens-tribunal` / `make tribunal`.
+- Classification: synonym expansions (talent acquisition, conversational agent, …) plus
+  semantic near-miss hints; optional `--promote-semantic` in the tribunal.
+- Gap analysis: keyword status unchanged, plus batched semantic look-here signals;
+  fix-first **document blueprints** in pack render / UI.
+- Web UI: Tribunal tab, fix-first blueprints, refreshed styling; static landing at `web/index.html`.
+- Deploy: `Dockerfile` for the Gradio app; MCP tool `evidence_tribunal`.
+- Evals extended for tribunal, synonyms, and blueprints.
+
 ## 0.2.0 Restructure
 - Proper Python package `policylens/` (installable with `pip install -e .`, console scripts) replacing the flat `src/` scripts.
 - Split the large evidence module into `classification.py`, `pack.py` and `render.py`; shared `paths.py`, `config.py`, `omnibus.py`.

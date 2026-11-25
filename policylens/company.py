@@ -64,3 +64,50 @@ def rank_by_meaning(query: str, passages: list[dict], top_k: int = 4) -> list[di
     scores = np.asarray(vecs) @ q
     order = np.argsort(scores)[::-1][:top_k]
     return [{**passages[int(i)], "score": float(scores[int(i)])} for i in order]
+
+
+def embed_passages(passages: list[dict]):
+    """Encode passages once for batch semantic gap scoring. Returns (passages, matrix)."""
+    if not passages:
+        return passages, None
+    from policylens.search import load
+
+    model, _, _ = load()
+    vecs = model.encode(
+        [p["heading"] + ". " + p["text"] for p in passages],
+        normalize_embeddings=True,
+    )
+    return passages, np.asarray(vecs)
+
+
+def semantic_obligation_hits(
+    passages: list[dict],
+    ask: str,
+    topic: str,
+    top_k: int = 3,
+    min_score: float = 0.42,
+    passage_vecs=None,
+) -> list[dict]:
+    """
+    Passages that mean something close to an obligation's ask/topic, even if keywords miss.
+    Returns [{id, score, heading}] — advisory; does not by itself prove evidence.
+    Pass `passage_vecs` from embed_passages() to avoid re-encoding.
+    """
+    if not passages:
+        return []
+    from policylens.search import QUERY_PREFIX, load
+
+    model, _, _ = load()
+    if passage_vecs is None:
+        _, passage_vecs = embed_passages(passages)
+    q = model.encode([QUERY_PREFIX + f"{topic}. {ask}"], normalize_embeddings=True)[0]
+    scores = passage_vecs @ q
+    order = np.argsort(scores)[::-1][:top_k]
+    out = []
+    for i in order:
+        sc = float(scores[int(i)])
+        if sc < min_score:
+            continue
+        p = passages[int(i)]
+        out.append({"id": p["id"], "score": round(sc, 3), "heading": p["heading"]})
+    return out

@@ -1,0 +1,10 @@
+.venv
+.git
+__pycache__
+*.pyc
+.env
+out/
+evals/reports/
+add./
+.DS_Store
+*.egg-info

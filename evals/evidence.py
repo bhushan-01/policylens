@@ -117,6 +117,49 @@ def main():
     finally:
         llm.complete_json = real
 
+    # 5b. synonym / unusual-wording classification (keyword expansions)
+    check(
+        "classify: talent acquisition ranking → HIGH-RISK",
+        "HIGH-RISK" in ep.classify_product("Talent acquisition ranking engine for job applicants")["tier"],
+    )
+    check(
+        "classify: conversational agent → TRANSPARENCY",
+        "TRANSPARENCY" in ep.classify_product("A conversational agent that chats with customers")["tier"],
+    )
+
+    # 5c. Evidence Tribunal: ledger only keeps real cites; defense motions fire
+    from policylens.tribunal import run_tribunal
+    from policylens.blueprint import blueprints_for_gaps
+
+    t = run_tribunal("Face recognition used to verify identity at login")
+    check("tribunal: returns a proof ledger", len(t["ledger"]) >= 1)
+    check(
+        "tribunal: every charge cite exists",
+        all(laws.exists(r["cite"]) for r in t["ledger"] if r.get("cite")),
+    )
+    check(
+        "tribunal: verification defense motion fires",
+        any(m["id"] == "verification_only" for m in t["defense"]),
+        str([m["id"] for m in t["defense"]]),
+    )
+    check(
+        "tribunal: every non-defense ledger cite exists",
+        all(laws.exists(r["cite"]) for r in t["ledger"] if r.get("cite") and not str(r["rule"]).startswith("defense:")),
+    )
+    hire_t = run_tribunal("CV screening software for HR teams")
+    check(
+        "tribunal: hiring product finds HIGH-RISK or surviving Annex charge",
+        "HIGH-RISK" in hire_t["verdict"]["finding"]
+        or any(r["rule"].startswith("A4") and r["status"] in {"VERIFIED", "CHALLENGED"} for r in hire_t["ledger"]),
+        hire_t["verdict"]["finding"],
+    )
+    bps = blueprints_for_gaps(ep.gap_analysis(passages, use_semantic=False))
+    check("blueprint: missing gaps get outlines", len(bps) >= 5 and all(bp.get("sections") for bp in bps))
+    check(
+        "blueprint: never claims compliance",
+        all("NEEDS INPUT" in bp["note"] for bp in bps),
+    )
+
     # 6. code scanner on a fictional repo with known problems
     res = code_scan.scan(REPO)
     rules = {f["rule"] for f in res["findings"]}

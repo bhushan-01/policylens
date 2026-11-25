@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PolicyLens — Cited EU AI Act answers</title>
+  <meta name="description" content="Evidence packs and an adversarial Evidence Tribunal for EU AI Act questionnaires. Every claim needs a citation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Sora:wght@400;550;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #10211b;
+      --fog: #dce8e2;
+      --signal: #1a6b56;
+      --ember: #c45c26;
+      --paper: #f3f7f4;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Sora", ui-sans-serif, system-ui, sans-serif;
+      background:
+        radial-gradient(900px 420px at 12% -8%, #b9dccf 0%, transparent 55%),
+        radial-gradient(700px 380px at 92% 8%, #c9d5e8 0%, transparent 50%),
+        linear-gradient(180deg, #f7faf8, #e9f0eb);
+      min-height: 100vh;
+    }
+    .shell { width: min(1080px, calc(100% - 2.5rem)); margin: 0 auto; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 0; gap: 1rem;
+    }
+    .brand {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 700; font-size: 1.35rem; letter-spacing: -0.02em;
+    }
+    nav a {
+      color: #355347; text-decoration: none; margin-left: 1.1rem; font-size: 0.92rem;
+    }
+    nav a:hover { color: var(--signal); }
+    .hero {
+      min-height: calc(100vh - 5rem);
+      display: grid;
+      align-content: center;
+      gap: 1.1rem;
+      padding: 2rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 8% -10% auto 35%;
+      height: 70%;
+      background:
+        linear-gradient(135deg, rgba(26,107,86,0.18), rgba(196,92,38,0.12)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect fill='%2310211b' width='800' height='500'/%3E%3Cg fill='none' stroke='%23b9dccf' stroke-width='1.2' opacity='0.55'%3E%3Cpath d='M80 80h180v90H80zM300 80h420v40H300zM300 140h260v30H300zM80 210h640v14H80zM80 250h520v14H80zM80 290h580v14H80zM80 360h200v80H80zM310 360h200v80H310zM540 360h180v80H540z'/%3E%3C/g%3E%3Ctext x='100' y='135' fill='%23e8f0ec' font-family='Georgia' font-size='28'%3EArticle 14%3C/text%3E%3Ctext x='320' y='108' fill='%23e8f0ec' font-family='Georgia' font-size='18'%3EProof ledger · VERIFIED%3C/text%3E%3C/svg%3E")
+        center/cover no-repeat;
+      border-radius: 1.25rem;
+      filter: saturate(1.05);
+      z-index: 0;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(12px) scale(1.02); }
+    }
+    .hero > * { position: relative; z-index: 1; max-width: 34rem; }
+    .eyebrow {
+      text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem;
+      color: var(--signal); font-weight: 600;
+      animation: rise 0.7s ease both;
+    }
+    h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      line-height: 1.05; letter-spacing: -0.03em; margin: 0;
+      animation: rise 0.8s 0.05s ease both;
+    }
+    .lede {
+      font-size: 1.05rem; color: #355347; margin: 0; max-width: 32rem;
+      animation: rise 0.8s 0.1s ease both;
+    }
+    .cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem;
+      animation: rise 0.8s 0.15s ease both; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.85rem 1.2rem; border-radius: 0.55rem; text-decoration: none;
+      font-weight: 600; font-size: 0.95rem; border: 1px solid transparent;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--ink); color: #f4faf7; }
+    .btn-ghost { background: rgba(255,255,255,0.55); color: var(--ink); border-color: #b7c9c0; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    section { padding: 3.5rem 0; }
+    section h2 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.85rem; letter-spacing: -0.02em; margin: 0 0 0.6rem;
+    }
+    section p.sub { color: #456356; margin: 0 0 1.5rem; max-width: 38rem; }
+    .grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .pane {
+      padding: 1.25rem 1.3rem; border-top: 2px solid var(--signal);
+      background: rgba(255,255,255,0.45);
+    }
+    .pane h3 { margin: 0 0 0.45rem; font-size: 1.05rem; }
+    .pane p { margin: 0; color: #456356; font-size: 0.95rem; }
+    footer {
+      border-top: 1px solid #c9d7cf; padding: 1.5rem 0 2.5rem;
+      color: #5a7166; font-size: 0.85rem;
+    }
+    @media (max-width: 800px) {
+      .hero::before { inset: auto 0 0 0; height: 42%; opacity: 0.55; }
+      .hero { padding-bottom: 12rem; }
+      nav a { margin-left: 0.7rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">PolicyLens</div>
+      <nav>
+        <a href="#how">How</a>
+        <a href="#tribunal">Tribunal</a>
+        <a href="https://github.com/bhushan-01/policylens">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <div class="eyebrow">EU AI Act · verified citations</div>
+      <h1>What the Act says about your product — with proof.</h1>
+      <p class="lede">Evidence packs for buyer questionnaires, plus an adversarial tribunal that drops uncitable claims. Built for AI hiring vendors who need drafts counsel can review.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/bhushan-01/policylens#quick-start">Run locally</a>
+        <a class="btn btn-ghost" href="#tribunal">See the tribunal</a>
+      </div>
+    </main>
+
+    <section id="how">
+      <h2>One law index. Three surfaces.</h2>
+      <p class="sub">Classification alone is free elsewhere. The paid pain is answering an EU buyer’s AI Act questionnaire without inventing evidence.</p>
+      <div class="grid">
+        <div class="pane">
+          <h3>Evidence Pack</h3>
+          <p>Your docs + their questionnaire → cited drafts, gap list, fix-first blueprints. Missing proof becomes NEEDS INPUT.</p>
+        </div>
+        <div class="pane">
+          <h3>Classifier</h3>
+          <p>Keyword + semantic near-miss pass over Annex III, Article 5, and Article 50 — every hit quotes the Act.</p>
+        </div>
+        <div class="pane">
+          <h3>Code scanner / MCP</h3>
+          <p>Repo red flags with file:line, and editor tools for Cursor / Claude that refuse uncitable answers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="tribunal">
+      <h2>Evidence Tribunal</h2>
+      <p class="sub">Not another chatty agent. Prosecutor charges, Defense files motions, Auditor verifies every quote against the Act, Clerk publishes only VERIFIED or CHALLENGED rows.</p>
+      <div class="grid">
+        <div class="pane">
+          <h3>Prosecutor</h3>
+          <p>Builds charges from rules and law search — with verbatim quotes.</p>
+        </div>
+        <div class="pane">
+          <h3>Defense</h3>
+          <p>Surfaces verification / fraud / medical carve-outs and Article 6(3) caution.</p>
+        </div>
+        <div class="pane">
+          <h3>Auditor</h3>
+          <p>Drops anything whose Article does not exist or whose quote is not in the Act.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Not legal advice. Regulation (EU) 2024/1689. Dates rely on the Omnibus note — re-verify against the Official Journal.
+      · <a href="https://github.com/bhushan-01/policylens">Source</a>
+    </footer>
+  </div>
+</body>
+</html>

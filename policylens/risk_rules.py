@@ -27,8 +27,9 @@ RULES = [
          marker="exploits any of the vulnerabilities", why="Possible exploitation of vulnerabilities (age, disability, social/economic situation) — Article 5(1)(b)."),
     dict(id="5c", tier="P", cite="Article 5", rx=R(r"social scor|social credit|rate (citizens|people) (by|on) (their )?behaviou?r", I),
          marker="based on their social behaviour", why="Social scoring — Article 5(1)(c)."),
-    dict(id="5d", tier="P", cite="Article 5", rx=R(r"predict\w*.{0,40}(commit|crime|criminal|re-?offend)|crime prediction|predictive policing", I),
-         marker="risk of a natural person committing a criminal offence", why="Predicting criminal offences from profiling — Article 5(1)(d)."),
+    dict(id="5d", tier="P", cite="Article 5", rx=R(r"predict\w*.{0,40}(commit|crime|criminal|re-?offend)|crime prediction|predictive policing|forecast\w*.{0,40}(offend|crime)|who will (commit|re-?offend)", I),
+         marker="risk of a natural person committing a criminal offence", why="Predicting criminal offences from profiling — Article 5(1)(d).",
+         intents=["predict who will commit a crime", "forecast reoffending risk"]),
     dict(id="5e", tier="P", cite="Article 5", rx=R(r"scrap\w*.{0,30}(face|facial|images|photos)|facial recognition database|face database", I),
          marker="untargeted scraping of facial images", why="Building facial-recognition databases by untargeted scraping — Article 5(1)(e)."),
     dict(id="5f", tier="P", cite="Article 5", rx=R(r"emotion|facial expression|stress level|mood", I), also=WORK_EDU,
@@ -52,10 +53,14 @@ RULES = [
          marker="evaluate learning outcomes", why="Annex III point 3(b): evaluating learning outcomes."),
     dict(id="A3d", tier="H", cite="Annex III", rx=R(r"proctor|cheating (detection|during)|detect(s|ing)? cheating", I),
          marker="prohibited behaviour of students during tests", why="Annex III point 3(d): proctoring / detecting prohibited behaviour in tests."),
-    dict(id="A4a", tier="H", cite="Annex III", rx=R(r"recruit|hiring|\bhire\b|candidate|applicant|\bcvs?\b|resume|résumé|job (ad|post|applic)|interview", I),
-         marker="recruitment or selection of natural persons", why="Annex III point 4(a): recruitment and selection."),
-    dict(id="A4b", tier="H", cite="Annex III", rx=R(r"promotion|terminat|performance (review|evaluation|monitor)|monitor(ing)? (employee|worker)|task allocation|workforce (monitor|analytics)", I),
-         marker="decisions affecting terms of work-related relationships", why="Annex III point 4(b): decisions on work relationships, promotion, termination, monitoring."),
+    dict(id="A4a", tier="H", cite="Annex III",
+         rx=R(r"recruit|hiring|\bhire\b|candidate|applicant|\bcvs?\b|resume|résumé|job (ad|post|applic)|interview|talent (acquisition|screening|matching)|shortlist|applicant ranking|\bats\b|screen(s|ing)? (job )?applicants", I),
+         marker="recruitment or selection of natural persons", why="Annex III point 4(a): recruitment and selection.",
+         intents=["talent acquisition ranking", "applicant shortlisting for jobs", "CV parsing for recruiters"]),
+    dict(id="A4b", tier="H", cite="Annex III",
+         rx=R(r"promotion|terminat|performance (review|evaluation|monitor)|monitor(ing)? (employee|worker)|task allocation|workforce (monitor|analytics)|dismiss(al|ing)? (employee|staff|worker)|fire (employee|staff)", I),
+         marker="decisions affecting terms of work-related relationships", why="Annex III point 4(b): decisions on work relationships, promotion, termination, monitoring.",
+         intents=["employee promotion decisions", "workforce performance monitoring"]),
     dict(id="A5a", tier="H", cite="Annex III", rx=R(r"(benefit|welfare|social assistance|public (service|assistance)).{0,40}eligib|eligib.{0,40}(benefit|welfare|social assistance)", I),
          marker="eligibility of natural persons for essential public assistance", why="Annex III point 5(a): public benefits eligibility."),
     dict(id="A5b", tier="H", cite="Annex III", rx=R(r"credit ?scor|creditworth|loan (approval|decision|underwrit|eligib)|assess(es|ing)? credit", I),
@@ -71,11 +76,19 @@ RULES = [
     dict(id="A8", tier="H", cite="Annex III", rx=R(r"\bcourts?\b|judicial|\bjudges?\b|legal ruling|dispute resolution|\belections?\b|\bvoters?\b|voting behaviou?r", I),
          marker="Administration of justice and democratic processes", why="Annex III point 8: justice and democratic processes."),
     # ---- Article 50: transparency
-    dict(id="T1", tier="T", cite="Article 50", rx=R(r"chatbot|virtual assistant|conversational|talks? to (users|customers)|customer support bot", I),
-         marker="informed that they are interacting", why="Interacts directly with people: Article 50(1) disclosure duty."),
+    dict(id="T1", tier="T", cite="Article 50", rx=R(r"chatbot|virtual assistant|conversational|talks? to (users|customers)|customer support bot|ai (that )?chats? with|conversational agent", I),
+         marker="informed that they are interacting", why="Interacts directly with people: Article 50(1) disclosure duty.",
+         intents=["customer-facing AI chat assistant"]),
     dict(id="T2", tier="T", cite="Article 50", rx=R(r"deepfake|synthetic (image|video|audio|media)|generat(e|es|ed|ing) (image|video|audio)s?|text-to-(image|video|speech)|voice clon", I),
-         marker="synthetic audio, image, video or text content", why="Generates synthetic media: Article 50(2) marking and Article 50(4) deepfake disclosure."),
+         marker="synthetic audio, image, video or text content", why="Generates synthetic media: Article 50(2) marking and Article 50(4) deepfake disclosure.",
+         intents=["AI-generated deepfake video"]),
     # ---- General-purpose AI models
     dict(id="G1", tier="G", cite="Article 53", rx=R(r"foundation model|general-purpose ai model|train(s|ing)? (our own|a|an|its own)? ?(large language model|llm|foundation model)", I),
-         marker="general-purpose AI model", why="Provider of a general-purpose AI model: Article 53 obligations may apply."),
+         marker="general-purpose AI model", why="Provider of a general-purpose AI model: Article 53 obligations may apply.",
+         intents=["we train our own large language model"]),
 ]
+
+# Short phrases used by the semantic near-miss layer (classification.py).
+def rule_intents(rule: dict) -> list[str]:
+    base = [rule["why"], rule["marker"]]
+    return base + list(rule.get("intents") or [])

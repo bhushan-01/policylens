@@ -36,3 +36,6 @@ evals/reports/
 
 # Generated pack output (examples/ holds a committed sample)
 out/
+
+# Accidental nested repos / scratch
+add./

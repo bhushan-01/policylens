@@ -32,6 +32,27 @@ def render_markdown(pack: dict) -> str:
           "### Fix first", ""]
     for g in [g for g in gaps if g["status"] != "Evidenced"]:
         L.append(f"- **{g['article']} — {g['topic']}** ({g['status']}): {g['ask']}")
+        near = g.get("semantic_near") or []
+        if near and g["status"] == "Missing":
+            L.append(
+                f"  - _Semantic look-here (not evidence): "
+                + ", ".join(f"{n['id']} ({n['score']})" for n in near[:2])
+                + "_"
+            )
+    try:
+        from policylens.blueprint import blueprints_for_gaps
+
+        bps = blueprints_for_gaps(gaps)
+        if bps:
+            L += ["", "### Document blueprints (fix first)", ""]
+            for bp in bps[:6]:
+                L.append(f"**{bp['topic']}** ({bp['article']}) — {bp['status']}")
+                L.append(f"_{bp['note']}_")
+                for s in bp["sections"][:4]:
+                    L.append(f"- {s}")
+                L.append("")
+    except Exception:
+        pass
     L += ["", "## 3. Questionnaire answers", ""]
     for i, a in enumerate(answers, 1):
         v = a["verification"]

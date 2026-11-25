@@ -36,7 +36,22 @@ from policylens.search import search
 
 # ---------------------------------------------------------------- gap analysis
 
-def gap_analysis(passages: list[dict]) -> list[dict]:
+def gap_analysis(passages: list[dict], *, use_semantic: bool = True) -> list[dict]:
+    """
+    Keyword triage of vendor docs against buyer-expected obligations.
+
+    Status stays keyword-based (deterministic, eval-stable). When `use_semantic=True`,
+    each row also gets `semantic_near` — passages that *mean* something close to the
+    obligation even if keywords missed. That is a look-here hint, not a compliance finding.
+    """
+    passage_vecs = None
+    if use_semantic:
+        try:
+            from policylens.company import embed_passages, semantic_obligation_hits
+
+            _, passage_vecs = embed_passages(passages)
+        except Exception:
+            use_semantic = False
     rows = []
     for o in OBLIGATIONS:
         hits = keyword_hits(passages, o["keywords"])
@@ -47,10 +62,17 @@ def gap_analysis(passages: list[dict]) -> list[dict]:
             status = "Partial"
         else:
             status = "Missing"
+        semantic_near = []
+        if use_semantic and passage_vecs is not None:
+            semantic_near = semantic_obligation_hits(
+                passages, o["ask"], o["topic"], passage_vecs=passage_vecs
+            )
         rows.append({
             "id": o["id"], "article": o["article"], "topic": o["topic"], "status": status,
             "ask": o["ask"], "matched_keywords": matched,
             "evidence": [p["id"] for p, _ in hits[:3]],
+            "semantic_near": semantic_near,
+            "method": "keyword+semantic" if use_semantic else "keyword",
         })
     return rows
 

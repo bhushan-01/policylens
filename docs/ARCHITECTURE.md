@@ -10,8 +10,9 @@ request, and the design decisions behind the trust features.
 | Classifier | "What does the EU AI Act say about my AI product?" | `policylens/checklist.py`, web UI tab |
 | Evidence Pack | "How do I answer my customer's AI Act questionnaire, with proof?" | `policylens/pack.py`, web UI tab |
 
-Supporting tools: code scanner (`policylens/scanner.py`), MCP server (`policylens/mcp_server.py`), tool-calling
-agent (`policylens/agent.py`, a learning exercise).
+Supporting tools: code scanner (`policylens/scanner.py`), MCP server (`policylens/mcp_server.py`),
+Evidence Tribunal (`policylens/tribunal.py` — adversarial proof ledger; `agent.py` redirects here),
+fix-first blueprints (`policylens/blueprint.py`).
 
 Why the Evidence Pack exists: risk classification alone is already free (EU Commission checker,
 Future of Life Institute, TÜV SÜD). The paid pain is the buyer questionnaire an AI vendor must answer
