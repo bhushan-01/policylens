@@ -74,8 +74,12 @@ def get_article(parent_id: str) -> str:
 def classify_product(product_description: str) -> str:
     """
     Classify an AI product under the EU AI Act.
-    Retrieves relevant law text and (if an API key is configured) generates a cited answer.
+    Always includes the rule-based first pass (verbatim quotes). Also retrieves law
+    excerpts and, if an API key is set, a cited narrative answer.
     """
+    from policylens.classification import classify_product as rule_classify
+
+    first = rule_classify(product_description)
     results = search(product_description, top_k=8)
     evidence = [
         {
@@ -88,30 +92,23 @@ def classify_product(product_description: str) -> str:
         for r in results
     ]
 
+    payload = {
+        "product": product_description,
+        "first_pass": first,
+        "evidence": evidence,
+    }
     env = load_env()
     if not env.get("OPENROUTER_API_KEY") and not env.get("ANTHROPIC_API_KEY"):
-        return json.dumps(
-            {
-                "mode": "retrieval_only",
-                "product": product_description,
-                "evidence": evidence,
-                "note": "Set OPENROUTER_API_KEY or ANTHROPIC_API_KEY in .env for a full written answer.",
-            },
-            indent=2,
-            ensure_ascii=False,
+        payload["mode"] = "rules_and_retrieval"
+        payload["note"] = (
+            "Rule-based first pass + retrieved citations. "
+            "Set OPENROUTER_API_KEY or ANTHROPIC_API_KEY in .env for a full written answer."
         )
+        return json.dumps(payload, indent=2, ensure_ascii=False)
 
-    answer = generate_answer(product_description, results)
-    return json.dumps(
-        {
-            "mode": "full_answer",
-            "product": product_description,
-            "answer": answer,
-            "evidence": evidence,
-        },
-        indent=2,
-        ensure_ascii=False,
-    )
+    payload["mode"] = "full_answer"
+    payload["answer"] = generate_answer(product_description, results)
+    return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()

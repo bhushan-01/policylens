@@ -19,7 +19,7 @@
 - Sending a vendor's real documents to an external LLM provider shares them with that provider.
   Use `--no-llm` or get consent first.
 
-## The 83 offline evals (`make test`)
+## The 92 offline evals (`make test`)
 
 No API key or network needed after the embedding model is cached.
 

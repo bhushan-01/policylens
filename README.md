@@ -26,7 +26,7 @@ git clone https://github.com/bhushan-01/policylens.git && cd policylens
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e . --no-deps
 cp .env.example .env          # optional: OPENROUTER_API_KEY or ANTHROPIC_API_KEY
-make test                     # 83 offline safety evals, no API key needed
+make test                     # 92 offline safety evals, no API key needed
 make demo-offline             # evidence pack on a fictional company, deterministic
 ```
 
@@ -36,7 +36,7 @@ No key? Everything runs offline. A key only improves the wording of drafted answ
 
 | Command | Does |
 |---|---|
-| `make test` | 83 offline safety evals |
+| `make test` | 92 offline safety evals |
 | `make test-all` | plus retrieval hit-rate and assertion evals |
 | `make demo` / `make demo-offline` | Evidence pack on `examples/sample_company` |
 | `make scan` | Code scan of `examples/sample_repo` |
