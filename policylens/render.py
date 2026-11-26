@@ -76,8 +76,18 @@ def render_html(pack: dict) -> str:
     qa = ""
     for i, a in enumerate(pack["answers"], 1):
         ans = re.sub(r"\[NEEDS INPUT[^\]]*\]", lambda m: f"<mark>{m.group(0)}</mark>", e(a["answer"]))
+        v = a.get("verification") or {}
+        warns = ""
+        if v.get("nonexistent") or v.get("unsupported") or v.get("bad_doc_refs"):
+            warns += (
+                f"<p class='warnline'>Citation check failed — nonexistent: {e(str(v.get('nonexistent')))}, "
+                f"not in evidence: {e(str(v.get('unsupported')))}, "
+                f"bad doc refs: {e(str(v.get('bad_doc_refs')))}</p>"
+            )
+        for fl in a.get("claim_flags") or []:
+            warns += f"<p class='warnline'>{e(fl)}</p>"
         qa += (f"<section><h3>Q{i}. {e(a['question'])}</h3><span class='b {badge[a['status']]}'>{STATUS_LABEL[a['status']]}</span>"
-               f"<p>{ans}</p><small>Law: {e(', '.join(a['law']))} · Docs: {e(', '.join(a['evidence']) or 'none')}</small></section>")
+               f"<p>{ans}</p>{warns}<small>Law: {e(', '.join(a['law']))} · Docs: {e(', '.join(a['evidence']) or 'none')}</small></section>")
     basis = "".join(f"<li><b>{e(b['cite'])}</b> — {e(b['why'])}<blockquote>{e(b['quote'])}</blockquote></li>" for b in pack["classification"]["basis"])
     s = pack["summary"]
     return f"""<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -86,7 +96,7 @@ def render_html(pack: dict) -> str:
 table{{border-collapse:collapse;width:100%}}td,th{{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;font-size:14px}}
 .b{{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}}.ok{{background:#d8f3dc}}.warn{{background:#ffe8a3}}.bad{{background:#ffd0d0}}
 blockquote{{margin:.4rem 0;padding-left:.8rem;border-left:3px solid #bbb;color:#444;font-size:14px}}section{{border-top:1px solid #eee;padding:.6rem 0}}
-mark{{background:#ffd0d0}}small{{color:#666}}</style>
+mark{{background:#ffd0d0}}small{{color:#666}}.warnline{{color:#8a1f1f;font-size:14px}}</style>
 <h1>AI Act Evidence Pack — {e(pack['company'])}</h1><p><small>{pack['date']} · {e(DISCLAIMER)}</small></p>
 <h2>Risk classification</h2><p><b>{e(pack['classification']['tier'])}</b></p><ul>{basis}</ul>
 <h2>Readiness</h2><p>{s['evidenced']} evidenced · {s['partial']} partial · {s['missing']} missing of {s['total']}</p>
@@ -100,9 +110,10 @@ def position_page(pack: dict) -> str:
     todo = [g for g in pack["gaps"] if g["status"] != "Evidenced"]
     L = [f"# {pack['company']} — EU AI Act position (DRAFT for counsel review)", "",
          f"**Classification:** {pack['classification']['tier']}", "",
-         "## What we already have in place", ""]
-    L += [f"- **{g['topic']}** ({g['article']}) — documented in {', '.join(g['evidence'])}" for g in ok] or ["- _(nothing evidenced yet)_"]
-    L += ["", "## In progress (do not publish until true)", ""]
+         "## Topics your documents mention", "",
+         "_Keyword hits only. This is not proof an obligation is met. Do not publish these as compliance claims._", ""]
+    L += [f"- **{g['topic']}** ({g['article']}) — keyword hits in {', '.join(g['evidence'])}" for g in ok] or ["- _(nothing mentioned yet)_"]
+    L += ["", "## Not mentioned yet", ""]
     L += [f"- {g['topic']} ({g['article']})" for g in todo]
     L += ["", "_Only publish statements you can back with documents. This page is generated from your own docs; edit before use._"]
     return "\n".join(L)

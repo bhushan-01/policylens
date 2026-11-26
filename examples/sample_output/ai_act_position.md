@@ -2,16 +2,18 @@
 
 **Classification:** HIGH-RISK (Annex III point 4(a))
 
-## What we already have in place
+## Topics your documents mention
 
-- **Data and data governance** (Article 10) — documented in data_governance.md § 1, data_governance.md § 2, data_governance.md § 3
-- **Transparency and instructions for use** (Article 13) — documented in human_oversight.md § 3, product_overview.md § 2
-- **Human oversight** (Article 14) — documented in human_oversight.md § 2, human_oversight.md § 3, human_oversight.md § 1
-- **Accuracy, robustness, cybersecurity** (Article 15) — documented in security_and_accuracy.md § 2, security_and_accuracy.md § 1, security_and_accuracy.md § 3
-- **Post-market monitoring** (Article 72) — documented in security_and_accuracy.md § 3
-- **AI literacy** (Article 4) — documented in human_oversight.md § 3
+_Keyword hits only. This is not proof an obligation is met. Do not publish these as compliance claims._
 
-## In progress (do not publish until true)
+- **Data and data governance** (Article 10) — keyword hits in data_governance.md § 1, data_governance.md § 2, data_governance.md § 3
+- **Transparency and instructions for use** (Article 13) — keyword hits in human_oversight.md § 3, product_overview.md § 2
+- **Human oversight** (Article 14) — keyword hits in human_oversight.md § 2, human_oversight.md § 3, human_oversight.md § 1
+- **Accuracy, robustness, cybersecurity** (Article 15) — keyword hits in security_and_accuracy.md § 2, security_and_accuracy.md § 1, security_and_accuracy.md § 3
+- **Post-market monitoring** (Article 72) — keyword hits in security_and_accuracy.md § 3
+- **AI literacy** (Article 4) — keyword hits in human_oversight.md § 3
+
+## Not mentioned yet
 
 - Risk management system (Article 9)
 - Technical documentation (Annex IV) (Article 11)

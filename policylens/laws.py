@@ -16,8 +16,11 @@ from policylens.paths import DATA_DIR
 
 CHUNKS_PATH = DATA_DIR / "chunks.json"
 
-# "Article 14", "Art. 14(4)", "Articles 9", "Annex III"  (only the first number of a range)
-CITE_RE = re.compile(r"\b(Article|Articles|Art\.|Annex)\s+(\d+|[IVX]+)\b")
+# "Article 14", "Art. 14(4)", "article 999", "Articles 9 and 999", "Annex III".
+# Articles/Art/Annex is case-insensitive. Every number in "9 and 999" is checked, not only the first.
+CITE_HEAD = re.compile(r"\b(Articles\b|Article\b|Art\.|Art\b|Annex\b)", re.I)
+_NUM = r"(?:\d+|[IVX]+\b)"  # the \b stops "Article in" being read as "Article I"
+CITE_RUN = re.compile(rf"\s*({_NUM}(?:\s*(?:,|and|&)\s*{_NUM})*)", re.I)
 
 
 @lru_cache(maxsize=1)
@@ -31,17 +34,32 @@ def label(chunk: dict) -> str:
 
 
 def norm_cite(kind: str, num: str) -> str:
-    return f"{'Annex' if kind == 'Annex' else 'Article'} {num}"
+    number = num.upper() if not num.isdigit() else num
+    if kind.lower().startswith("annex"):
+        return f"Annex {number}"
+    return f"Article {number}"
+
+
+def _first_cite(text: str) -> tuple[str, str] | None:
+    m = CITE_HEAD.search(text or "")
+    if not m:
+        return None
+    run = CITE_RUN.match(text, m.end())
+    if not run:
+        return None
+    num = re.findall(r"\d+|[IVX]+", run.group(1), re.I)[0]
+    return m.group(1), num
 
 
 def get(cite: str) -> dict | None:
-    """'Article 14' / 'Annex III' -> full chunk, or None if it does not exist."""
-    m = CITE_RE.search(cite)
-    if not m:
+    """'Article 14' / 'Annex III' / 'article 14' -> full chunk, or None if it does not exist."""
+    parsed = _first_cite(cite)
+    if not parsed:
         return None
-    kind, num = m.groups()
-    prefix = "annex" if kind == "Annex" else "art"
-    return parents().get(f"{prefix}_{num}")
+    kind, num = parsed
+    label = norm_cite(kind, num)
+    prefix = "annex" if label.startswith("Annex") else "art"
+    return parents().get(f"{prefix}_{label.split(' ', 1)[1]}")
 
 
 def exists(cite: str) -> bool:
@@ -49,7 +67,14 @@ def exists(cite: str) -> bool:
 
 
 def extract_citations(text: str) -> set[str]:
-    return {norm_cite(k, n) for k, n in CITE_RE.findall(text)}
+    found: set[str] = set()
+    for m in CITE_HEAD.finditer(text or ""):
+        run = CITE_RUN.match(text, m.end())
+        if not run:
+            continue
+        for num in re.findall(r"\d+|[IVX]+", run.group(1), re.I):
+            found.add(norm_cite(m.group(1), num))
+    return found
 
 
 def check_citations(text: str, allowed: set[str]) -> dict:

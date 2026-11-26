@@ -26,7 +26,7 @@ from pathlib import Path
 
 from policylens import laws, llm
 from policylens.classification import classify_product
-from policylens.company import keyword_hits, load_passages, rank_by_meaning
+from policylens.company import keyword_hits, keyword_in, load_passages, rank_by_meaning
 from policylens.obligations import OBLIGATIONS
 from policylens.omnibus import OMNIBUS_NOTE
 from policylens.paths import ROOT
@@ -88,7 +88,8 @@ def parse_questions(path: str | Path) -> list[str]:
         return [r[col].strip() for r in rows if col and r[col].strip()]
     qs = []
     for line in p.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"^\s*(?:\d+[.)]|[-*])\s+(.*\S)", line)
+        # "1. ...", "1) ...", "Q1: ...", "Question 2. ...", or a bullet.
+        m = re.match(r"^\s*(?:(?:question\s+|q\s*)?\d+[.):]|[-*])\s*(.*\S)", line, re.I)
         if m:
             qs.append(m.group(1))
     return qs
@@ -96,7 +97,10 @@ def parse_questions(path: str | Path) -> list[str]:
 
 def law_context(question: str) -> tuple[list[dict], set[str]]:
     """Law excerpts for a question: semantic search + best-matching known obligations."""
-    hits = search(question, top_k=5)
+    try:
+        hits = search(question, top_k=5)
+    except Exception:
+        hits = []
     excerpts, allowed, seen = [], set(), set()
     for h in hits:
         if h["id"] in seen:
@@ -106,9 +110,12 @@ def law_context(question: str) -> tuple[list[dict], set[str]]:
         allowed.add(h["citation"])
     # anchor with the obligation Article(s) whose keywords/topic match the question
     q = question.lower()
-    scored = sorted(OBLIGATIONS, key=lambda o: -sum(k in q for k in o["keywords"] + o["topic"].lower().split("/")))
+    scored = sorted(
+        OBLIGATIONS,
+        key=lambda o: -(sum(keyword_in(q, k) for k in o["keywords"]) + sum(w in q for w in o["topic"].lower().split("/"))),
+    )
     for o in scored[:2]:
-        if sum(k in q for k in o["keywords"]) and o["article"] not in allowed:
+        if sum(keyword_in(q, k) for k in o["keywords"]) and o["article"] not in allowed:
             excerpts.append({"cite": o["article"], "title": o["topic"], "text": laws.excerpt(o["article"], 1800)})
             allowed.add(o["article"])
     return excerpts, allowed
@@ -130,7 +137,7 @@ def match_obligation(question: str) -> dict | None:
     q = question.lower()
     best, top = None, 0
     for o in OBLIGATIONS:
-        score = 2 * sum(k in q for k in o["keywords"])
+        score = 2 * sum(keyword_in(q, k) for k in o["keywords"])
         score += 2 * sum(bool(re.search(h, q)) for h in QUESTION_HINTS.get(o["id"], []))
         score += sum(w in q for w in re.findall(r"[a-z]{5,}", o["topic"].lower()) if w not in GENERIC_WORDS)
         if score > top:
@@ -161,21 +168,24 @@ def draft_answer(question: str, passages: list[dict], use_llm: bool, gaps: dict,
             break
         if p["id"] not in seen_ev:
             ev.append(p); seen_ev.add(p["id"])
-    law, allowed = law_context(question)
-    if ob:  # the obligation's own Article first, so it is always grounded
-        law = [l for l in law if l["cite"] == ob["article"]] or \
-              [{"cite": ob["article"], "title": ob["topic"], "text": laws.excerpt(ob["article"], 2200)}] + law
-        allowed.add(ob["article"])
+    law, _search_allowed = law_context(question)
+    if ob:  # the obligation's own Article first, then the other excerpts actually retrieved
+        own = [l for l in law if l["cite"] == ob["article"]]
+        rest = [l for l in law if l["cite"] != ob["article"]]
+        if not own:
+            own = [{"cite": ob["article"], "title": ob["topic"], "text": laws.excerpt(ob["article"], 2200)}]
+        law = own + rest
     if re.search(r"classif|high.?risk", question, re.I):  # reuse the verified classification quotes
         for b in classification["basis"]:
             if b["quote"]:
-                law.append({"cite": b["cite"], "title": "quoted in classification", "text": b["quote"]}); allowed.add(b["cite"])
+                law.append({"cite": b["cite"], "title": "quoted in classification", "text": b["quote"]})
     law = law[:7]
-    # Citations the model was shown: excerpt headers, plus Articles/Annexes named inside the shown text
-    # (and the date note). Anything else it cites is ungrounded and gets flagged.
+    # Only citations whose text was placed in the prompt count as shown.
+    # A name in the date note is not the text of that Article or Annex.
+    allowed: set[str] = set()
     for l in law:
+        allowed.add(l["cite"])
         allowed |= laws.extract_citations(l["text"])
-    allowed |= laws.extract_citations(OMNIBUS_NOTE)
     no_doc = bool(ob) and gaps[ob["id"]]["status"] == "Missing"
     law_cites = list(dict.fromkeys(l["cite"] for l in law))  # de-duplicate, keep order ("Article 14, Article 14")
     rec = {"question": question, "law": law_cites, "evidence": [e["id"] for e in ev], "mode": "offline",
@@ -210,7 +220,12 @@ def draft_answer(question: str, passages: list[dict], use_llm: bool, gaps: dict,
     # --- claim guards: things documents rarely prove ---
     body = re.sub(r"\[NEEDS INPUT[^\]]*\]", "", rec["answer"])
     rec["claim_flags"] = []
-    if re.search(r"\b(we|our (system|product|model)|the system)\s+(do(es)? not|don't|never|has no|have no|is not)\b", body, re.I):
+    if re.search(
+        r"\b(we|our (system|product|model)|the (system|platform|product|vendor|model))\s+"
+        r"(do(es)? not|don't|never|has no|have no|is not)\b"
+        r"|\b(is|are|was|were)\s+not\b|\bno\s+(audit|logging|logs|documentation|oversight|registration)\b",
+        body, re.I,
+    ):
         rec["claim_flags"].append("negative claim (e.g. 'we do not…'): documents rarely prove absence — confirm it is true")
     if re.search(r"\bwe (will|plan to|intend to)\b", body, re.I):
         rec["claim_flags"].append("forward commitment: confirm you actually intend to promise this")
@@ -271,6 +286,11 @@ def build_pack(docs: str, questionnaire: str, product: str | None = None, use_ll
         company = re.sub(r"\s*\(.*?\)\s*", "", heading).strip() or company  # generic folder name: use the title
 
     questions = parse_questions(questionnaire)
+    if not questions:
+        raise SystemExit(
+            "No questions found. Use a numbered list (1. ... or Q1:), bullets, "
+            "or a CSV with a question column."
+        )
     gaps = gap_analysis(passages)
     classification = classify_product(description)
     answers = [draft_answer(q, passages, use_llm, {g["id"]: g for g in gaps}, classification) for q in questions]

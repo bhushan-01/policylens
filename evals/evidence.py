@@ -202,6 +202,106 @@ def main():
     clean = code_scan.scan(COMPANY)  # docs only, no code
     check("scan: no code findings on a docs-only folder", clean["findings"] == [], str(clean["findings"][:1]))
 
+    # 6b. false evidence and false risk labels the happy-path fixtures never hit
+    check(
+        "citation: lowercase article 999 is nonexistent",
+        laws.check_citations("article 999 is banned", set())["nonexistent"] == ["Article 999"],
+    )
+    both = laws.check_citations("Articles 9 and 999", set())
+    check("citation: Articles 9 and 999 flags 999", "Article 999" in both["nonexistent"], str(both))
+
+    from policylens.classification import classify_product as _clf
+
+    def _tier(text):
+        return _clf(text, use_semantic=False)["tier"]
+
+    check("classify: denial of emotion detection is not prohibited", "PROHIBITED" not in _tier("We do not detect employee emotions or mood at work."))
+    check("classify: news candidate summaries are not hiring", "HIGH-RISK" not in _tier("The model returns candidate summaries of news articles."))
+    check("classify: promotional email is not employment", "HIGH-RISK" not in _tier("We send promotional emails about our weather app."))
+    check("classify: session termination is not dismissal", "HIGH-RISK" not in _tier("Automatic session termination after an idle timeout for a weather API."))
+    check("classify: courting customers is not a court", "HIGH-RISK" not in _tier("We court enterprise customers with a newsletter."))
+    check("classify: ticket triage is not emergency triage", "HIGH-RISK" not in _tier("Support ticket triage chatbot for password resets."))
+    check("classify: a student mood journal is not prohibited", "PROHIBITED" not in _tier("Students use a mood journal to pin class inspiration."))
+    check("classify: foundation model is GPAI, not minimal risk", "GPAI" in _tier("We train our own foundation model."))
+    check("classify: candidates excluded from hiring is still hiring", "HIGH-RISK" in _tier("Candidates excluded from hiring are stored in this list."))
+
+    hostile = (
+        "# Overview\n\n"
+        "Acme is a company registered in Delaware. Account registration is self-serve.\n"
+        "We have not completed conformity assessment and there is no CE marking.\n"
+        "The benchmark is unbiased and the sample is representative.\n"
+        "The system is unregistered and has no EU database entry at all today.\n"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        (_P(tmp) / "overview.md").write_text(hostile, encoding="utf-8")
+        hostile_gaps = {g["article"]: g["status"] for g in ep.gap_analysis(ep.load_passages(tmp), use_semantic=False)}
+    check("gaps: Delaware registration is not EU-database evidence", hostile_gaps["Article 49"] != "Evidenced", hostile_gaps["Article 49"])
+    check("gaps: a denied conformity assessment is not Evidenced", hostile_gaps["Article 43"] != "Evidenced", hostile_gaps["Article 43"])
+    check("gaps: unbiased does not evidence bias testing", hostile_gaps["Article 10"] != "Evidenced", hostile_gaps["Article 10"])
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = _P(tmp)
+        legal = root / "legal"
+        legal.mkdir()
+        (legal / "overview.md").write_text(
+            "# Nested Co — Product Overview\n\nThis tool screens job applicants for recruiters using a ranking model today.\n",
+            encoding="utf-8",
+        )
+        q = root / "q.md"
+        q.write_text("Q1: Is the system high-risk?\n", encoding="utf-8")
+        check("parse: Q1: questions are kept", ep.parse_questions(q) == ["Is the system high-risk?"])
+        nested = ep.build_pack(str(root), str(q), use_llm=False)
+        check(
+            "pack: a document in a subfolder does not crash",
+            nested["company"] == "Nested Co" and len(nested["answers"]) == 1,
+            nested["company"],
+        )
+
+    scope = run_tribunal("CV screening software for HR teams. Biometric identification is out of scope.")
+    check(
+        "tribunal: an out-of-scope aside does not weaken a hiring charge",
+        any(r["rule"] == "A4a" and r["status"] == "VERIFIED" for r in scope["ledger"]),
+        str([(r["rule"], r["status"]) for r in scope["ledger"] if not str(r["rule"]).startswith("defense:")]),
+    )
+    gpai = run_tribunal("We train our own foundation model.")
+    check("tribunal: a foundation model is not called minimal risk", "GPAI" in gpai["verdict"]["finding"], gpai["verdict"]["finding"])
+
+    from policylens.render import render_html
+
+    html = render_html({
+        "company": "Acme", "date": "2026-11-26", "mode": "llm",
+        "classification": {"tier": "HIGH-RISK", "basis": [{"cite": "Annex III", "why": "x", "quote": "q"}], "notes": []},
+        "gaps": [{"topic": "Logging", "article": "Article 12", "status": "Missing", "evidence": [], "ask": "x"}],
+        "summary": {"evidenced": 0, "partial": 0, "missing": 1, "total": 1},
+        "answers": [{
+            "question": "Do you log?", "status": "review", "answer": "We log forever (Article 999).",
+            "missing": [], "law": ["Article 12"], "evidence": [],
+            "verification": {"nonexistent": ["Article 999"], "unsupported": [], "bad_doc_refs": ["made_up.md § 1"]},
+            "claim_flags": ["negative claim example"],
+        }],
+    })
+    check("html: citation failure is visible", "Article 999" in html and "made_up.md" in html and "negative claim" in html)
+
+    # 6c. narrowing false positives must never clear a real use
+    check("citation: abbreviated Art. 999 is still caught",
+          laws.check_citations("See Art. 999.", set())["nonexistent"] == ["Article 999"])
+    check("citation: Art. 14(4) is read", laws.extract_citations("Per Art. 14(4)") == {"Article 14"})
+    check("citation: ordinary words are not Roman numerals",
+          laws.extract_citations("the Article in question and the Annex volume") == set())
+    for text, want in [
+        ("Our tool screens job applicants and never stores resumes.", "HIGH-RISK"),
+        ("Recruiters never have to screen resumes again with our AI.", "HIGH-RISK"),
+        ("Our AI ranks applicants and recruiters cannot see the reasons.", "HIGH-RISK"),
+        ("We score candidates for open roles.", "HIGH-RISK"),
+        ("We rank candidates automatically.", "HIGH-RISK"),
+        ("Software that helps you hire faster.", "HIGH-RISK"),
+        ("AI video interview scoring.", "HIGH-RISK"),
+        ("An algorithm that decides employee termination.", "HIGH-RISK"),
+        ("AI used by a court to assess defendants.", "HIGH-RISK"),
+        ("Detects student mood in the classroom.", "PROHIBITED"),
+    ]:
+        check(f"classify: not cleared: {text[:44]!r}", want in _tier(text), _tier(text))
+
     passed = sum(RESULTS)
     print(f"\n{passed}/{len(RESULTS)} passed")
     sys.exit(0 if passed == len(RESULTS) else 1)

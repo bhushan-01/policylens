@@ -64,7 +64,12 @@ def load():
             _chunks = json.load(f)
         _embeddings = np.load(EMB_PATH)
     if _model is None:
-        _model = SentenceTransformer(MODEL_NAME)
+        try:
+            _model = SentenceTransformer(MODEL_NAME)
+        except Exception:
+            # A cached model still tries the Hub for a revision. A 403 or offline
+            # network must fall back to the files already on disk.
+            _model = SentenceTransformer(MODEL_NAME, local_files_only=True)
     return _model, _chunks, _embeddings
 
 
