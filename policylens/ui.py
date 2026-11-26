@@ -28,24 +28,18 @@ EXAMPLES = [
 ]
 
 CSS = """
-:root {
-  --pl-ink: #0f1c18;
-  --pl-fog: #e8f0ec;
-  --pl-signal: #1f6f5b;
-  --pl-warn: #b45309;
-  --pl-paper: #f4f7f5;
-}
+/* Gradio puts the `dark` class on <body> (not <html>), so every theme rule keys off body.dark.
+   We never force text colours: Gradio picks readable text for each mode, we only tint the page. */
 .gradio-container {
   font-family: "IBM Plex Sans", "Source Sans 3", ui-sans-serif, system-ui, sans-serif !important;
 }
-/* Light mode: soft green/blue wash. Dark mode: leave Gradio's own dark background alone. */
-:root:not(.dark) .gradio-container {
+body:not(.dark) .gradio-container {
   background:
     radial-gradient(1200px 500px at 10% -10%, #cfe8df 0%, transparent 55%),
     radial-gradient(900px 400px at 100% 0%, #d9e4f0 0%, transparent 50%),
     linear-gradient(180deg, #f7faf8 0%, #eef3f0 100%) !important;
 }
-.dark .gradio-container {
+body.dark .gradio-container {
   background:
     radial-gradient(1200px 500px at 10% -10%, #123329 0%, transparent 55%),
     linear-gradient(180deg, #0f1714 0%, #0b1210 100%) !important;
@@ -56,32 +50,28 @@ CSS = """
   letter-spacing: -0.02em;
   margin-bottom: 0.25rem !important;
 }
-:root:not(.dark) .pl-hero h1 { color: var(--pl-ink) !important; }
-.dark .pl-hero h1 { color: #e8f0ec !important; }
-:root:not(.dark) .pl-hero p { color: #345045 !important; }
-.dark .pl-hero p { color: #a9c2b6 !important; }
+body:not(.dark) .pl-hero h1 { color: #0f1c18 !important; }
+body.dark .pl-hero h1 { color: #e8f0ec !important; }
+body:not(.dark) .pl-hero p { color: #345045 !important; }
+body.dark .pl-hero p { color: #a9c2b6 !important; }
 .pl-hero p { max-width: 46rem; }
-/* Result panes: always readable regardless of theme */
-:root:not(.dark) .prose, :root:not(.dark) .prose *:not(code) { color: #10211b; }
-.dark .prose, .dark .prose *:not(code) { color: #e8f0ec; }
-/* Inline code: readable chip in both themes */
-.prose code {
-  background: #dfeae4 !important; color: #10211b !important;
-  padding: 0.1rem 0.35rem; border-radius: 0.3rem; white-space: nowrap;
-}
-.dark .prose code { background: #1f3a30 !important; color: #d9efe5 !important; }
-/* Keep short table columns (Status, Cite) on one line */
-.prose th, .prose td { white-space: nowrap; }
-.prose td:last-child, .prose th:last-child { white-space: normal; }
 .pl-badge {
   display: inline-block;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--pl-signal);
+  color: #1f6f5b;
   font-weight: 600;
   margin-bottom: 0.4rem;
 }
+body.dark .pl-badge { color: #6fd0b0; }
+/* Inline code chips: readable in both themes */
+.prose code { padding: 0.1rem 0.35rem; border-radius: 0.3rem; white-space: nowrap; }
+body:not(.dark) .prose code { background: #dfeae4 !important; color: #10211b !important; }
+body.dark .prose code { background: #1f3a30 !important; color: #d9efe5 !important; }
+/* Keep short table columns (Status, Cite) on one line; let the last column wrap */
+.prose th, .prose td { white-space: nowrap; }
+.prose td:last-child, .prose th:last-child { white-space: normal; }
 footer { display: none !important; }
 """
 
