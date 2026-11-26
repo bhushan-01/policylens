@@ -44,7 +44,7 @@ jobs:
   ai-act-drift:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: bhushan-01/policylens@main   # pin to a commit SHA for real use

@@ -29,7 +29,7 @@
   unsupported statement: **read every GROUNDED statement against its quotes.** That is one run on a toy repo, not an evaluation.
 - Repository text can try to instruct the agent (prompt injection). The gate limits what becomes a finding, but open questions are unchecked model text.
 - Drift can be evaded: ignore comments, files over 300 KB, skipped folders, or code the patterns do not know.
-- The GitHub Action itself has been run locally as a shell script, not yet on GitHub.
+- The GitHub Action has run on GitHub only on this repository's own pull request. It has not been tried from another repository.
 
 ## The 164 offline evals (`make test`)
 
