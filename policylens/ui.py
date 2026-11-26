@@ -37,19 +37,42 @@ CSS = """
 }
 .gradio-container {
   font-family: "IBM Plex Sans", "Source Sans 3", ui-sans-serif, system-ui, sans-serif !important;
+}
+/* Light mode: soft green/blue wash. Dark mode: leave Gradio's own dark background alone. */
+:root:not(.dark) .gradio-container {
   background:
     radial-gradient(1200px 500px at 10% -10%, #cfe8df 0%, transparent 55%),
     radial-gradient(900px 400px at 100% 0%, #d9e4f0 0%, transparent 50%),
     linear-gradient(180deg, #f7faf8 0%, #eef3f0 100%) !important;
 }
+.dark .gradio-container {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #123329 0%, transparent 55%),
+    linear-gradient(180deg, #0f1714 0%, #0b1210 100%) !important;
+}
 .pl-hero h1 {
   font-family: "IBM Plex Serif", "Source Serif 4", Georgia, serif !important;
   font-size: 2.1rem !important;
   letter-spacing: -0.02em;
-  color: var(--pl-ink) !important;
   margin-bottom: 0.25rem !important;
 }
-.pl-hero p { color: #345045 !important; max-width: 46rem; }
+:root:not(.dark) .pl-hero h1 { color: var(--pl-ink) !important; }
+.dark .pl-hero h1 { color: #e8f0ec !important; }
+:root:not(.dark) .pl-hero p { color: #345045 !important; }
+.dark .pl-hero p { color: #a9c2b6 !important; }
+.pl-hero p { max-width: 46rem; }
+/* Result panes: always readable regardless of theme */
+:root:not(.dark) .prose, :root:not(.dark) .prose *:not(code) { color: #10211b; }
+.dark .prose, .dark .prose *:not(code) { color: #e8f0ec; }
+/* Inline code: readable chip in both themes */
+.prose code {
+  background: #dfeae4 !important; color: #10211b !important;
+  padding: 0.1rem 0.35rem; border-radius: 0.3rem; white-space: nowrap;
+}
+.dark .prose code { background: #1f3a30 !important; color: #d9efe5 !important; }
+/* Keep short table columns (Status, Cite) on one line */
+.prose th, .prose td { white-space: nowrap; }
+.prose td:last-child, .prose th:last-child { white-space: normal; }
 .pl-badge {
   display: inline-block;
   font-size: 0.75rem;
@@ -153,7 +176,7 @@ def run_tribunal(product: str, promote: bool):
 
 def main():
     share = os.environ.get("POLICYLENS_SHARE", "").lower() in {"1", "true", "yes"}
-    with gr.Blocks(title="PolicyLens", css=CSS, theme=gr.themes.Soft(primary_hue="emerald")) as demo:
+    with gr.Blocks(title="PolicyLens") as demo:
         with gr.Column(elem_classes=["pl-hero"]):
             gr.HTML(
                 '<div class="pl-badge">PolicyLens · EU AI Act</div>'
@@ -189,15 +212,16 @@ def main():
                 value=False,
             )
             t_btn = gr.Button("Convene tribunal", variant="primary")
-            with gr.Row():
-                t_md = gr.Markdown()
+            t_md = gr.Markdown()
+            with gr.Accordion("Ledger JSON (machine-readable)", open=False):
                 t_json = gr.Code(language="json", label="Ledger JSON")
             gr.Examples(EXAMPLES, inputs=[t_in])
             t_btn.click(run_tribunal, inputs=[t_in, t_prom], outputs=[t_md, t_json])
             t_in.submit(run_tribunal, inputs=[t_in, t_prom], outputs=[t_md, t_json])
         with gr.Tab("Classify"):
             _classify_tab()
-    demo.launch(share=share)
+    # Gradio >= 6 takes theme/css in launch(); older versions take them in Blocks().
+    demo.launch(share=share, theme=gr.themes.Soft(primary_hue="emerald"), css=CSS)
 
 
 def _classify_tab():

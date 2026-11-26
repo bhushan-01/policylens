@@ -140,6 +140,8 @@ def _defense(product: str, charges: list[dict]) -> list[dict]:
             "cite": "Article 6",
             "quote": laws.quote_around("Article 6", "Notwithstanding the first subparagraph", 0, 181),
             "role": "defense",
+            # A caution, not a real defense: it must not downgrade a charge to CHALLENGED.
+            "advisory": True,
         })
     return motions
 
@@ -149,6 +151,8 @@ def _audit(charges: list[dict], motions: list[dict]) -> list[dict]:
     ledger = []
     challenged = set()
     for m in motions:
+        if m.get("advisory"):
+            continue  # cautions are shown to the reader but do not weaken a charge
         for t in m.get("targets") or []:
             challenged.add(t)
 
@@ -288,7 +292,9 @@ def render_tribunal_markdown(result: dict) -> str:
         "|---|---|---|---|",
     ]
     for row in result["ledger"]:
-        why = row["why"].replace("|", "/")[:120]
+        why = row["why"].replace("|", "/")
+        if len(why) > 140:  # cut at a word boundary, never mid-sentence
+            why = why[:140].rsplit(" ", 1)[0].rstrip(",;:— -") + "…"
         lines.append(f"| {row['status']} | `{row['rule']}` | {row['cite']} | {why} |")
     if result.get("semantic_near"):
         lines += ["", "## Semantic near-misses (not charged)", ""]

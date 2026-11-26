@@ -153,6 +153,12 @@ def main():
         or any(r["rule"].startswith("A4") and r["status"] in {"VERIFIED", "CHALLENGED"} for r in hire_t["ledger"]),
         hire_t["verdict"]["finding"],
     )
+    check(
+        "tribunal: Art 6(3) caution does not downgrade a clear hiring charge",
+        any(r["rule"] == "A4a" and r["status"] == "VERIFIED" for r in hire_t["ledger"])
+        and hire_t["verdict"]["confidence"] == "high",
+        str([(r["rule"], r["status"]) for r in hire_t["ledger"]]),
+    )
     bps = blueprints_for_gaps(ep.gap_analysis(passages, use_semantic=False))
     check("blueprint: missing gaps get outlines", len(bps) >= 5 and all(bp.get("sections") for bp in bps))
     check(
