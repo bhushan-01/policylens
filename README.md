@@ -18,7 +18,7 @@ agent claim ──► code quote at that file:line, and really code (not a comme
           GROUNDED ◄────┴────► REJECTED + reason (the agent can fix it or drop it)
 ```
 
-**GROUNDED means the quotes exist. It does not mean the law applies.** That judgment stays with a human. What the gate removes is invented evidence.
+**GROUNDED means the quotes exist. It does not mean the law applies.** That judgment stays with a human. What the gate removes is invented evidence. It cannot tell whether a statement says more than its quotes show; that happened in our first live run ([limits](docs/SAFETY_AND_LIMITS.md)).
 
 | Use it with | How | API key |
 |---|---|---|
@@ -78,7 +78,7 @@ git clone https://github.com/bhushan-01/policylens.git && cd policylens
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e . --no-deps
 cp .env.example .env          # optional: OPENROUTER_API_KEY or ANTHROPIC_API_KEY
-make test                     # 162 offline safety evals, no API key needed
+make test                     # 164 offline safety evals, no API key needed
 make demo-offline             # evidence pack on a fictional company, deterministic
 ```
 
@@ -88,7 +88,7 @@ No key? Everything runs offline. A key only improves the wording of drafted answ
 
 | Command | Does |
 |---|---|
-| `make test` | 162 offline safety evals |
+| `make test` | 164 offline safety evals |
 | `make test-all` | plus retrieval hit-rate and assertion evals |
 | `make demo` / `make demo-offline` | Evidence pack on `examples/sample_company` |
 | `make scan` | Code scan of `examples/sample_repo` |
@@ -138,7 +138,7 @@ policylens/                  the package
   mcp_server.py  ui.py       editor tools and web UI
 web/                         static landing page
   ingest/                    one-time PDF -> chunks -> embeddings pipeline
-evals/                       evidence + gate (162), retrieval, assertions; fixtures/
+evals/                       evidence + gate (164), retrieval, assertions; fixtures/
 examples/                    fictional sample company, questionnaire, repo, sample output
 data/                        the Act: pdf, text, chunks, split chunks, embeddings
 docs/                        guides; docs/learning/ holds the study material

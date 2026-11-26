@@ -24,12 +24,14 @@
 - GROUNDED means the code quote is at that line and the law quote is in that Article/Annex. It does not check that the statement follows from them. A model can pair two real quotes badly.
 - The wording rules (verdicts, absence claims) are pattern lists in English. Rephrasing can get past them.
 - The investigator needs `--send-code` because file contents go to your model provider. It reads source-code files inside the given folder only (not `.env`, not symlinks). Secrets hard-coded in source would be sent.
-- The investigator loop is tested with a scripted model only. It has not been evaluated with a live model.
+- One live run on the fictional sample app (2026-11-26): 5 claims GROUNDED, 2 rejected. One accepted claim said a
+  function "interacts with job applicants" when its quoted line only sends resume text to a model. Real quotes,
+  unsupported statement: **read every GROUNDED statement against its quotes.** That is one run on a toy repo, not an evaluation.
 - Repository text can try to instruct the agent (prompt injection). The gate limits what becomes a finding, but open questions are unchecked model text.
 - Drift can be evaded: ignore comments, files over 300 KB, skipped folders, or code the patterns do not know.
 - The GitHub Action itself has been run locally as a shell script, not yet on GitHub.
 
-## The 162 offline evals (`make test`)
+## The 164 offline evals (`make test`)
 
 No API key or network needed after the embedding model is cached.
 

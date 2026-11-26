@@ -97,6 +97,9 @@ export function autoReject(applicant) { return false; }
     rejected("a too-short law quote", law_quote="natural persons")
     rejected("a compliance verdict", statement="This code calls auto_reject and is therefore compliant with the rules.")
     rejected("an absence claim", statement="The system does not give any recruiter a way to review the rejection.")
+    # wording a live model actually used to slip an absence claim through
+    rejected("'without recruiter involvement'", statement="The auto_reject function is called to reject applicants without recruiter involvement.")
+    rejected("'no human review'", statement="auto_reject runs on applicants with no human review of the rejection step.")
     rejected("an extra unquoted citation", statement="auto_reject needs review under Article 14 and also Article 99.")
     rejected("path traversal", file="../sample_company/product_overview.md")
     rejected("a missing field", law_quote="")

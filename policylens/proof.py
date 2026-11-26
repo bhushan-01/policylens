@@ -28,7 +28,8 @@ VERDICT_WORDS = re.compile(
     r"\b(compliant|compliance is (met|achieved)|complies|conforms|no (legal )?risk|fully (meets|satisfies)|"
     r"(is|are) (legal|illegal|lawful|unlawful)|violates|in breach)\b", re.I)
 ABSENCE_WORDS = re.compile(
-    r"\b(does not|do not|doesn't|don't|never|there is no|there are no|has no|have no|lacks?|without any|missing)\b", re.I)
+    r"\b(does not|do not|doesn't|don't|never|there is no|there are no|has no|have no|lacks?|without|missing|"
+    r"absent|absence of|no (human|recruiter|reviewer|review|oversight|logging|logs|disclosure|notice|documentation))\b", re.I)
 
 
 def _flat(s: str) -> str:

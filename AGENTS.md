@@ -38,7 +38,7 @@ that replaces the free-form agent with an adversarial proof ledger, and an MCP s
 | Agent side | proof.py (gate), investigate.py (agent loop), drift.py (PR check), ../action.yml |
 | Tribunal / MCP | tribunal.py (agent.py redirects here), mcp_server.py (tools: search_law, get_article, classify_product, evidence_tribunal, scan_codebase, evidence_gaps, verify_citations, submit_claim, legal_drift) |
 | Fix-first blueprints | blueprint.py |
-| Evals | evals/evidence.py + evals/gate.py (162 offline checks), evals/retrieval.py, evals/assertions.py; fixtures in evals/fixtures/ |
+| Evals | evals/evidence.py + evals/gate.py (164 offline checks), evals/retrieval.py, evals/assertions.py; fixtures in evals/fixtures/ |
 | Demo inputs | examples/sample_company, sample_questionnaire.md, sample_repo, sample_output |
 | Business | docs/BUSINESS_PLAN.md, docs/CUSTOMER_DISCOVERY.md, docs/OUTREACH.md |
 

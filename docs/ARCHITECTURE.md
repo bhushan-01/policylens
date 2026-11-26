@@ -62,7 +62,7 @@ All code lives in the `policylens/` package. Run modules with `python -m policyl
 | `agent.py` | Tool-calling agent (learning exercise and hard cases) |
 | `ingest/` | One-time PDF to chunks to embeddings pipeline, plus a token-limit check |
 
-Tests live in `evals/` (`evidence.py` plus `gate.py`, 162 offline checks, `retrieval.py`, `assertions.py`) with fixtures
+Tests live in `evals/` (`evidence.py` plus `gate.py`, 164 offline checks, `retrieval.py`, `assertions.py`) with fixtures
 in `evals/fixtures/`. Demo inputs and a sample output live in `examples/`.
 
 ## 4. Evidence Pack data flow
