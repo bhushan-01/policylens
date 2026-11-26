@@ -166,3 +166,7 @@ docs/                        guides; docs/learning/ holds the study material
 - The Digital Omnibus delay dates (`policylens/omnibus.py`) are unverified against the Official Journal.
 - The code scanner finds patterns, not behavior. Silence is not compliance.
 - No real customer has used this yet. Validate demand first: [docs/CUSTOMER_DISCOVERY.md](docs/CUSTOMER_DISCOVERY.md).
+
+## License
+
+[Apache-2.0](LICENSE) for the code. The Act text in `data/` is EU legal text from the Official Journal and is not covered by this license. To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
