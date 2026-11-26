@@ -177,7 +177,8 @@ def draft_answer(question: str, passages: list[dict], use_llm: bool, gaps: dict,
         allowed |= laws.extract_citations(l["text"])
     allowed |= laws.extract_citations(OMNIBUS_NOTE)
     no_doc = bool(ob) and gaps[ob["id"]]["status"] == "Missing"
-    rec = {"question": question, "law": [l["cite"] for l in law], "evidence": [e["id"] for e in ev], "mode": "offline",
+    law_cites = list(dict.fromkeys(l["cite"] for l in law))  # de-duplicate, keep order ("Article 14, Article 14")
+    rec = {"question": question, "law": law_cites, "evidence": [e["id"] for e in ev], "mode": "offline",
            "obligation": ob["id"] if ob else None}
 
     if use_llm:
@@ -213,6 +214,13 @@ def draft_answer(question: str, passages: list[dict], use_llm: bool, gaps: dict,
         rec["claim_flags"].append("negative claim (e.g. 'we do not…'): documents rarely prove absence — confirm it is true")
     if re.search(r"\bwe (will|plan to|intend to)\b", body, re.I):
         rec["claim_flags"].append("forward commitment: confirm you actually intend to promise this")
+    if rec["mode"] == "llm":
+        # Golden rule: company facts come only from the vendor's documents. A sentence that speaks
+        # for the company ("we", "our") with no [doc: ...] citation is an unsupported company claim.
+        uncited = [s.strip() for s in re.split(r"(?<=[.!?])\s+", body)
+                   if re.search(r"\b(we|our|us)\b", s, re.I) and "[doc:" not in s and len(s.split()) >= 5]
+        if uncited:
+            rec["claim_flags"].append("uncited company claim: no [doc: ...] source for “" + uncited[0][:110].rstrip() + "…”")
 
     # --- citation verification (the trust feature) ---
     chk = laws.check_citations(rec["answer"], allowed)
@@ -252,9 +260,15 @@ def build_pack(docs: str, questionnaire: str, product: str | None = None, use_ll
     overview = next((p for p in passages if "overview" in p["file"].lower() or "intended" in p["heading"].lower()), passages[0])
     description = product or " ".join(p["text"] for p in passages if p["file"] == overview["file"])
     company = Path(docs).name.replace("_", " ").title()
-    first = next((l for l in (Path(docs) / overview["file"]).read_text().splitlines() if l.startswith("# ")), "")
-    if "—" in first:
-        company = first.lstrip("# ").split("—")[0].strip()
+    first = next((l for l in (Path(docs) / overview["file"]).read_text(encoding="utf-8", errors="ignore").splitlines()
+                  if l.startswith("# ")), "")
+    heading = first.lstrip("# ").strip()
+    # "Acme — Product Overview", "Acme - Product Overview", "Acme: Product Overview" -> "Acme"
+    parts = re.split(r"\s+[—–-]\s+|:\s+", heading, maxsplit=1)
+    if len(parts) == 2 and parts[0]:
+        company = parts[0].strip()
+    elif heading and company.lower() in {"docs", "documents", "uploads", "company", "sample company"}:
+        company = re.sub(r"\s*\(.*?\)\s*", "", heading).strip() or company  # generic folder name: use the title
 
     questions = parse_questions(questionnaire)
     gaps = gap_analysis(passages)

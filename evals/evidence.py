@@ -114,8 +114,33 @@ def main():
         a = ep.draft_answer("What cybersecurity measures protect the system?", passages, True,
                             {g["id"]: g for g in ep.gap_analysis(passages)}, hire)
         check("adversarial: fabricated doc reference caught", bool(a["verification"]["bad_doc_refs"]) and a["status"] == "review", a["status"])
+
+        llm.complete_json = lambda *a, **k: {
+            "answer": "Our technical documentation is available to every customer and regulator. "
+                      "Recruiters can override any ranking [doc: human_oversight.md § 2].",
+            "missing": []}
+        a = ep.draft_answer("How do you ensure effective human oversight of the system?", passages, True,
+                            {g["id"]: g for g in ep.gap_analysis(passages, use_semantic=False)}, hire)
+        check("adversarial: uncited company claim is flagged, not READY",
+              any("uncited company claim" in f for f in a["claim_flags"]) and a["status"] != "ready", str(a["claim_flags"]))
+        check("pack: law list has no duplicates", len(a["law"]) == len(set(a["law"])), str(a["law"]))
     finally:
         llm.complete_json = real
+
+    # 5a. company name comes from the document title, even when the folder is called "docs"
+    import tempfile
+    from pathlib import Path as _P
+
+    with tempfile.TemporaryDirectory() as tmp:
+        d = _P(tmp) / "docs"
+        d.mkdir()
+        (d / "product_overview.md").write_text(
+            "# TalentRank - Product Overview\n\n## Intended purpose\n"
+            "TalentRank helps recruiters analyse and filter job applications for open roles.\n", encoding="utf-8")
+        q = _P(tmp) / "q.md"
+        q.write_text("1. What is the intended purpose?\n", encoding="utf-8")
+        check("pack: company name taken from the title, not the folder 'docs'",
+              ep.build_pack(str(d), str(q), use_llm=False)["company"] == "TalentRank")
 
     # 5b. synonym / unusual-wording classification (keyword expansions)
     check(

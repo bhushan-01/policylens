@@ -22,6 +22,8 @@ def render_markdown(pack: dict) -> str:
         if b["quote"]:
             L.append(f"  > “{b['quote']}”")
     for n in c["notes"]:
+        if n.startswith("Semantic near-misses"):
+            continue  # internal look-here hint; stays in the JSON, not in a buyer-facing pack
         L += ["", f"_{n}_"]
     L += ["", "## 2. Readiness against buyer-expected evidence", "",
           "| Obligation | Article | Status | Where we found it |", "|---|---|---|---|"]
