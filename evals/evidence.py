@@ -302,6 +302,11 @@ def main():
     ]:
         check(f"classify: not cleared: {text[:44]!r}", want in _tier(text), _tier(text))
 
+    # 7. code facts, proof gate, investigator agent, legal drift
+    from evals import gate
+
+    gate.run(check)
+
     passed = sum(RESULTS)
     print(f"\n{passed}/{len(RESULTS)} passed")
     sys.exit(0 if passed == len(RESULTS) else 1)

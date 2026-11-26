@@ -62,7 +62,7 @@ All code lives in the `policylens/` package. Run modules with `python -m policyl
 | `agent.py` | Tool-calling agent (learning exercise and hard cases) |
 | `ingest/` | One-time PDF to chunks to embeddings pipeline, plus a token-limit check |
 
-Tests live in `evals/` (`evidence.py` 96 offline checks, `retrieval.py`, `assertions.py`) with fixtures
+Tests live in `evals/` (`evidence.py` plus `gate.py`, 162 offline checks, `retrieval.py`, `assertions.py`) with fixtures
 in `evals/fixtures/`. Demo inputs and a sample output live in `examples/`.
 
 ## 4. Evidence Pack data flow
@@ -87,8 +87,7 @@ render: evidence_pack.md / .html / .json, gaps.csv, ai_act_position.md
 ```
 
 ### Gap analysis rules
-For each obligation, count distinct obligation keywords found across all passages (the file title and
-heading are included in the searched text):
+For each obligation, count distinct keywords found in the vendor's documents. A keyword must match as a whole word (`bias` does not match `unbiased`). A keyword inside a negated sentence (`no CE marking`, `not completed`) does not count. The file title and a non-negated heading count too.
 
 | Distinct keywords | Status |
 |---|---|
@@ -96,12 +95,12 @@ heading are included in the searched text):
 | 1 | Partial |
 | 0 | Missing |
 
-This is keyword triage that shows where to look first. It is not a compliance finding, and the pack says so.
+This is keyword triage that shows where to look first. It is not a compliance finding. The public position page says "topics your documents mention", not "what we already have in place".
 
 ### Classification
 `classification.classify_product` first removes sentences that state what the product is NOT for (for example "not intended for promotion decisions"), then runs every rule in `risk_rules.py`. A rule matches when its regex matches the
 description (and its optional context regex, for example workplace words for the emotion ban).
-Precedence: prohibited, then high-risk, then transparency, then none. High-risk results also quote
+Precedence: prohibited, then high-risk, then transparency, then GPAI, then none. A sentence that says "we do not" or "never" is not treated as a use. High-risk results also quote
 Article 6(2)/6(3) and the profiling caveat, plus the Omnibus date note. It flags and never clears.
 
 ## 5. Trust model: how fabrication is prevented

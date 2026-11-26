@@ -19,7 +19,17 @@
 - Sending a vendor's real documents to an external LLM provider shares them with that provider.
   Use `--no-llm` or get consent first.
 
-## The 96 offline evals (`make test`)
+## Proof gate, investigator and drift
+
+- GROUNDED means the code quote is at that line and the law quote is in that Article/Annex. It does not check that the statement follows from them. A model can pair two real quotes badly.
+- The wording rules (verdicts, absence claims) are pattern lists in English. Rephrasing can get past them.
+- The investigator needs `--send-code` because file contents go to your model provider. It reads source-code files inside the given folder only (not `.env`, not symlinks). Secrets hard-coded in source would be sent.
+- The investigator loop is tested with a scripted model only. It has not been evaluated with a live model.
+- Repository text can try to instruct the agent (prompt injection). The gate limits what becomes a finding, but open questions are unchecked model text.
+- Drift can be evaded: ignore comments, files over 300 KB, skipped folders, or code the patterns do not know.
+- The GitHub Action itself has been run locally as a shell script, not yet on GitHub.
+
+## The 162 offline evals (`make test`)
 
 No API key or network needed after the embedding model is cached.
 

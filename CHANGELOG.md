@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased: agents with receipts
+- **Proof gate** (`proof.py`, MCP `submit_claim`): agent findings need a real code quote and a real law quote.
+- **Investigator agent** (`investigate.py`): explores a repo and can report only through the gate.
+- **Legal drift** (`drift.py`, `action.yml`, MCP `legal_drift`): reports what a change adds; markdown, JSON, SARIF.
+- **Scanner reads code, not words** (`codefacts.py`): scanning this repo went from 13 findings (10 CRITICAL, 9 of those
+  false) to 6, all but one in the planted sample app. Findings now include the line of code. Inline ignore comments.
+  Symlinks are skipped.
+- CI workflow; offline evals.
+- Gap keywords are whole words, and a negated sentence no longer counts as evidence.
+- Classification no longer treats a denial ("we do not detect emotions"), "promotional email", "session termination", or "we court customers" as an Annex III or Article 5 hit. Training a foundation model is labeled GPAI.
+- Citation checks are case-insensitive and catch every number in "Articles 9 and 999".
+- The position page says which topics the documents mention. It does not say those obligations are already in place.
+
 ## 0.3.0 Evidence Tribunal + hardening
 - Replaced the free-form tool-calling agent with an **Evidence Tribunal**
   (Prosecutor → Defense → Citation Auditor → proof ledger). `python -m policylens.agent`
