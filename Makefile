@@ -1,6 +1,6 @@
 PY=.venv/bin/python
 
-.PHONY: install test test-all demo demo-offline scan ui mcp tribunal ingest landing docker
+.PHONY: install test test-all demo demo-offline scan drift ui mcp tribunal ingest landing docker
 
 install:       ## editable install of the package
 	$(PY) -m pip install -e . --no-deps
@@ -24,6 +24,9 @@ scan:          ## Code scanner on the fictional sample repo
 
 tribunal:      ## Evidence Tribunal on a sample hiring product
 	$(PY) -m policylens.tribunal "CV screening software for HR teams"
+
+drift:         ## What do uncommitted changes add compared with main?
+	$(PY) -m policylens.drift --base main
 
 ui:            ## Web UI (Evidence Pack + Tribunal + classifier)
 	$(PY) -m policylens.ui

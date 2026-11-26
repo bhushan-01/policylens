@@ -74,6 +74,8 @@ DEFENSE_PATTERNS = [
         ),
         "cite": None,
         "marker": None,
+        # A caution only. "Biometrics are out of scope" must not weaken a real hiring charge.
+        "advisory": True,
     },
 ]
 
@@ -126,6 +128,7 @@ def _defense(product: str, charges: list[dict]) -> list[dict]:
             "cite": pat["cite"],
             "quote": quote,
             "role": "defense",
+            "advisory": bool(pat.get("advisory")),
         })
     # Art 6(3) caution whenever high-risk Annex III is charged
     if any(c["rule"].startswith("A") for c in charges):
@@ -229,6 +232,8 @@ def _verdict(product: str, prosecution: dict, motions: list[dict], ledger: list[
         finding = "HIGH-RISK (charges survived audit)"
     elif "TRANSPARENCY" in tiers:
         finding = "TRANSPARENCY obligations likely"
+    elif "GPAI" in tiers:
+        finding = "GPAI obligations may apply (Article 53)"
     elif challenged and not verified:
         finding = "CHARGES CHALLENGED — counsel review before deciding"
     else:

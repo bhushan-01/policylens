@@ -127,9 +127,9 @@ def run_pack(files, questionnaire, no_llm):
     tmp = Path(tempfile.mkdtemp())
     docs = tmp / "docs"
     docs.mkdir()
-    for f in files:
+    for i, f in enumerate(files, 1):
         src = Path(getattr(f, "name", f))
-        (docs / src.name).write_bytes(src.read_bytes())
+        (docs / f"{i:02d}_{src.name}").write_bytes(src.read_bytes())
     q = Path(getattr(questionnaire, "name", questionnaire))
     pack = build_pack(str(docs), str(q), use_llm=False if no_llm else None)
     paths = write_outputs(pack, tmp / "out")

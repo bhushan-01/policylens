@@ -1,0 +1,43 @@
+name: PolicyLens AI Act drift
+description: Flags what a pull request adds that may matter under the EU AI Act. No API key; code stays on the runner.
+branding:
+  icon: shield
+  color: blue
+inputs:
+  base:
+    description: Git ref to compare against. Defaults to the pull request's base commit.
+    default: ${{ github.event.pull_request.base.sha }}
+  path:
+    description: Directory to scan.
+    default: "."
+  fail-on:
+    description: "Fail when the change adds a finding at or above this severity: critical, high, medium, low or never."
+    default: high
+outputs:
+  sarif:
+    description: Path of the SARIF report, for github/codeql-action/upload-sarif.
+    value: ${{ steps.drift.outputs.sarif }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+    - id: drift
+      shell: bash
+      env:
+        PL_BASE: ${{ inputs.base }}
+        PL_PATH: ${{ inputs.path }}
+        PL_FAIL_ON: ${{ inputs.fail-on }}
+        PL_SRC: ${{ github.action_path }}
+      # -P keeps the checked-out (untrusted) directory off the import path. Standard library only.
+      run: |
+        if [ -z "$PL_BASE" ]; then echo "::error::No base ref. Run on pull_request or set 'base'."; exit 2; fi
+        export PYTHONPATH="$PL_SRC"
+        sarif="$RUNNER_TEMP/policylens.sarif"
+        python -P -m policylens.drift --base="$PL_BASE" --format sarif --out "$sarif" --fail-on never "$PL_PATH"
+        echo "sarif=$sarif" >> "$GITHUB_OUTPUT"
+        status=0
+        python -P -m policylens.drift --base="$PL_BASE" --out "$RUNNER_TEMP/policylens.md" --fail-on "$PL_FAIL_ON" "$PL_PATH" || status=$?
+        if [ -f "$RUNNER_TEMP/policylens.md" ]; then tee -a "$GITHUB_STEP_SUMMARY" < "$RUNNER_TEMP/policylens.md"; fi
+        exit $status

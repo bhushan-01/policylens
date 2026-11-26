@@ -27,8 +27,20 @@ def _quote(cite: str, marker: str) -> str:
 
 # Sentences that state what the product is NOT for must not trigger a rule
 # ("not intended for promotion decisions" is an exclusion, not a use case).
+# Bare "excluded" / "out of scope" are not stripped: "candidates excluded from hiring"
+# is still a hiring use.
 EXCLUSION = re.compile(
-    r"[^.]*\b(not intended (for|to be used)|not (designed|meant|built) for|is not used (for|in)|excluded|out of scope)\b[^.]*\.?",
+    r"[^.]*\b(not intended (for|to be used)|not (designed|meant|built) for|is not used (for|in))\b[^.]*\.?",
+    re.I,
+)
+
+# "We do not detect emotions" is a denial, not a prohibited practice. Only a negation directly
+# followed by a use verb is removed, and only up to the end of its clause: "screens applicants
+# and never stores resumes" must stay a hiring use. When unsure, keep the text and flag it.
+NEGATED = re.compile(
+    r"\b(?:do(?:es)? not|don't|doesn't|never|cannot|can't|no longer)\s+"
+    r"(?:detect|infer|recogni[sz]e|analy[sz]e|identify|classify|use|perform|process|screen|rank|score|evaluate|monitor|track)(?:s|es)?\b"
+    r"(?:(?!\b(?:but|because|although|though|while|whereas|instead|however|and|we|it|our)\b)[^.,;:])*",
     re.I,
 )
 
@@ -107,7 +119,7 @@ def classify_product(description: str, *, use_semantic: bool = True, promote_sem
     They only become charges when `promote_semantic=True` (tribunal / exploratory mode) —
     the default pack/eval path stays keyword-deterministic.
     """
-    scanned = EXCLUSION.sub(" ", description)
+    scanned = NEGATED.sub(" ", EXCLUSION.sub(" ", description))
     hits = [
         r for r in RULES
         if r["rx"].search(scanned) and (r.get("also") is None or r["also"].search(scanned))
@@ -162,6 +174,8 @@ def classify_product(description: str, *, use_semantic: bool = True, promote_sem
         tier = f"HIGH-RISK (Annex III point {points})"
     elif transp:
         tier = "TRANSPARENCY obligations likely (Article 50)"
+    elif gpai:
+        tier = "GPAI obligations may apply (Article 53) — confirm whether you are the model provider"
     else:
         tier = "No Annex III / Article 5 trigger found by keyword rules — likely minimal risk, confirm"
 

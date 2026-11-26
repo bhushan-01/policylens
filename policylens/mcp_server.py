@@ -4,6 +4,7 @@ Phase 4: PolicyLens MCP server.
 Exposes tools to Cursor / Claude Code / Claude Desktop:
 - search_law, get_article, classify_product, evidence_tribunal
 - scan_codebase, evidence_gaps, verify_citations
+- submit_claim (proof gate for agents), legal_drift
 
 Run (stdio), from the project root or after `pip install -e .`:
   python -m policylens.mcp_server
@@ -143,6 +144,33 @@ def verify_citations(text: str) -> str:
 
     cited = laws.extract_citations(text)
     return json.dumps({"cited": sorted(cited), "nonexistent": sorted(c for c in cited if not laws.exists(c))})
+
+
+@mcp.tool()
+def submit_claim(repo_path: str, statement: str, file: str, line: int, code_quote: str, cite: str, law_quote: str) -> str:
+    """
+    Proof gate. Use this before telling the user that code is relevant to an AI Act provision.
+    code_quote must be copied exactly from `line` of `file` (code, not a comment); law_quote must be
+    40+ characters copied exactly from the one Article/Annex in `cite` (read it with get_article).
+    Returns GROUNDED or REJECTED with reasons. Only report GROUNDED claims as findings.
+    GROUNDED means the quotes exist, not that the law applies.
+    """
+    from policylens import proof
+
+    claim = {"statement": statement, "file": file, "line": line, "code_quote": code_quote,
+             "cite": cite, "law_quote": law_quote}
+    return json.dumps(proof.verify_claim(repo_path, claim), indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def legal_drift(repo_path: str, base_ref: str = "main") -> str:
+    """
+    What do the current changes add, compared with git `base_ref`, that may matter under the
+    EU AI Act? Use before opening a pull request. Heuristic flags, not a legal finding.
+    """
+    from policylens import drift
+
+    return json.dumps(drift.drift(repo_path, base_ref), indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
